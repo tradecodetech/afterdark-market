@@ -1,0 +1,192 @@
+// Prisma schema for AfterDark Market.
+//
+// NOTE ON PROVIDER: this project ships against SQLite so it runs anywhere
+// with zero external services. SQLite does not support native enums, so
+// role/status fields are plain strings constrained in code (see
+// src/lib/constants.ts). To move to Postgres for production: change
+// `provider` below to "postgresql", set DATABASE_URL to a Postgres
+// connection string, and re-run `npx prisma migrate dev`. See README.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --- Users & auth -----------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("CUSTOMER") // CUSTOMER | VENDOR | ADMIN
+  dateOfBirth  DateTime
+  ageVerified  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  vendorId String?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String  @default("Home")
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  postal    String
+  country   String  @default("US")
+  isDefault Boolean @default(false)
+}
+
+// --- Vendors ------------------------------------------------------------
+
+model Vendor {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  contactEmail    String
+  integrationType String   @default("MANUAL") // MANUAL | API
+  discreetLabel   String   @default("Plain Box Co.") // shows on discreet packaging/billing
+  apiBaseUrl      String?
+  apiKey          String?
+  fieldMapping    String? // JSON string mapping vendor feed fields -> our Product fields
+  approved        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  users      User[]
+  products   Product[]
+  orderItems OrderItem[]
+  syncLogs   VendorSyncLog[]
+}
+
+model VendorSyncLog {
+  id           String    @id @default(cuid())
+  vendorId     String
+  vendor       Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  startedAt    DateTime  @default(now())
+  finishedAt   DateTime?
+  status       String    @default("RUNNING") // RUNNING | SUCCESS | ERROR
+  itemsSynced  Int       @default(0)
+  errorMessage String?
+}
+
+// --- Catalog --------------------------------------------------------------
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  slug     String     @unique
+  parentId String?
+  parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryToCategory")
+  products Product[]
+}
+
+model Product {
+  id                String   @id @default(cuid())
+  vendorId          String
+  vendor            Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  categoryId        String
+  category          Category @relation(fields: [categoryId], references: [id])
+  title             String
+  slug              String   @unique
+  description       String
+  price             Int // cents
+  compareAtPrice    Int?
+  sku               String
+  stock             Int      @default(0)
+  imageUrl          String
+  discreetPackaging Boolean  @default(true)
+  isActive          Boolean  @default(true)
+  source            String   @default("MANUAL") // MANUAL | API
+  externalId        String? // id from vendor's API feed, for upserts on sync
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([vendorId, externalId])
+}
+
+// --- Cart -------------------------------------------------------------
+
+model Cart {
+  id     String     @id @default(cuid())
+  userId String     @unique
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  CartItem[]
+}
+
+model CartItem {
+  id        String  @id @default(cuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int     @default(1)
+
+  @@unique([cartId, productId])
+}
+
+// --- Orders -------------------------------------------------------------
+
+model Order {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  status            String   @default("PENDING") // PENDING | PAID | FAILED | CANCELLED
+  subtotal          Int
+  shippingTotal     Int
+  total             Int
+  shippingLine1     String
+  shippingLine2     String?
+  shippingCity      String
+  shippingState     String
+  shippingPostal    String
+  shippingCountry   String   @default("US")
+  billingDescriptor String // discreet statement descriptor shown to the customer
+  createdAt         DateTime @default(now())
+
+  items    OrderItem[]
+  payments Payment[]
+}
+
+model OrderItem {
+  id                 String   @id @default(cuid())
+  orderId            String
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id])
+  vendorId           String
+  vendor             Vendor   @relation(fields: [vendorId], references: [id])
+  titleSnapshot      String
+  priceSnapshot      Int
+  quantity           Int
+  fulfillmentStatus  String   @default("UNFULFILLED") // UNFULFILLED | SHIPPED | DELIVERED | CANCELLED
+  trackingNumber     String?
+  shippedAt          DateTime?
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider    String   @default("mock") // mock | ccbill | segpay | epoch
+  providerRef String
+  status      String // AUTHORIZED | CAPTURED | FAILED | REFUNDED
+  amount      Int
+  createdAt   DateTime @default(now())
+}
