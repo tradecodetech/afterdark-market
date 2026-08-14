@@ -22,10 +22,15 @@ field in `package.json`) if it ever needs to change again.
 
 ```bash
 npm install
-npx prisma migrate dev   # creates prisma/dev.db and applies the schema
-npm run db:seed          # demo categories, vendors, products, and accounts
+npm run setup             # creates .env (if missing) and generates AUTH_SECRET
+npx prisma migrate dev    # creates prisma/dev.db and applies the schema
+npm run db:seed           # demo categories, vendors, products, and accounts
 npm run dev
 ```
+
+`npm run setup` is idempotent — safe to re-run any time (e.g. after
+pulling an update); it only fills in `AUTH_SECRET` if it's missing or
+empty, it won't touch one you've already set.
 
 Open http://localhost:3000. You'll hit the 18+ age gate first (any
 visitor, cookie-based, independent of login).
