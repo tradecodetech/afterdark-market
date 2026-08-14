@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/catalog";
 import { addToCart } from "@/lib/actions/cart-actions";
 import { formatCents } from "@/lib/constants";
+import { getOpenSession } from "@/lib/group-buy";
+import GroupBuyWidget from "./GroupBuyWidget";
 
 export default async function ProductPage({
   params,
@@ -11,6 +13,10 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
 
   if (!product || !product.isActive) notFound();
+
+  const groupBuySession = product.groupBuyEnabled
+    ? await getOpenSession(product.id)
+    : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
@@ -50,6 +56,17 @@ export default async function ProductPage({
             Ships from {product.vendor.name} in plain, unmarked packaging.
             Billing statement will read &ldquo;{product.vendor.discreetLabel}&rdquo;.
           </div>
+
+          {product.groupBuyEnabled && product.groupBuyTarget && product.groupBuyPrice && (
+            <GroupBuyWidget
+              productId={product.id}
+              regularPrice={product.price}
+              groupPrice={product.groupBuyPrice}
+              target={product.groupBuyTarget}
+              currentCount={groupBuySession?._count.participants ?? 0}
+              expiresAt={groupBuySession?.expiresAt.toISOString() ?? null}
+            />
+          )}
 
           <form action={addToCart} className="mt-6 flex items-center gap-3">
             <input type="hidden" name="productId" value={product.id} />

@@ -44,14 +44,14 @@ async function main() {
 
   await upsertUser({
     name: "Admin",
-    email: "admin@afterdark.market",
+    email: "admin@pikaboo.app",
     password: "Admin123!",
     role: "ADMIN",
   });
 
   await upsertUser({
     name: "Demo Customer",
-    email: "customer@afterdark.market",
+    email: "customer@pikaboo.app",
     password: "Customer123!",
     role: "CUSTOMER",
   });
@@ -70,7 +70,7 @@ async function main() {
   });
   await upsertUser({
     name: "Velvet Manufacturing (vendor)",
-    email: "velvet@afterdark.market",
+    email: "velvet@pikaboo.app",
     password: "Vendor123!",
     role: "VENDOR",
     vendorId: velvet.id,
@@ -96,6 +96,9 @@ async function main() {
       sku: "VM-002",
       categoryId: wellness.id,
       imageUrl: "/placeholders/midnight-bullet-vibe.svg",
+      groupBuyEnabled: true,
+      groupBuyTarget: 3,
+      groupBuyPrice: 1299,
     },
     {
       title: "Lace Bodysuit",
@@ -126,6 +129,9 @@ async function main() {
       sku: "VM-005",
       categoryId: couples.id,
       imageUrl: "/placeholders/duo-pleasure-set.svg",
+      groupBuyEnabled: true,
+      groupBuyTarget: 2,
+      groupBuyPrice: 4499,
     },
     {
       title: "Leather Cuffs",
@@ -162,7 +168,7 @@ async function main() {
   });
   await upsertUser({
     name: "Pulse Novelties (vendor)",
-    email: "pulse@afterdark.market",
+    email: "pulse@pikaboo.app",
     password: "Vendor123!",
     role: "VENDOR",
     vendorId: pulse.id,
@@ -220,10 +226,10 @@ async function main() {
   }
 
   console.log("Seed complete.");
-  console.log("Admin:    admin@afterdark.market / Admin123!");
-  console.log("Customer: customer@afterdark.market / Customer123!");
-  console.log("Vendor (manual): velvet@afterdark.market / Vendor123!");
-  console.log("Vendor (API):    pulse@afterdark.market / Vendor123!");
+  console.log("Admin:    admin@pikaboo.app / Admin123!");
+  console.log("Customer: customer@pikaboo.app / Customer123!");
+  console.log("Vendor (manual): velvet@pikaboo.app / Vendor123!");
+  console.log("Vendor (API):    pulse@pikaboo.app / Vendor123!");
 }
 
 main()

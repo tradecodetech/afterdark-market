@@ -12,6 +12,7 @@ const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  phone: z.string().min(7, "Enter a valid phone number"),
   dateOfBirth: z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
     message: "Enter a valid date",
   }),
@@ -37,6 +38,7 @@ export async function registerUser(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    phone: formData.get("phone"),
     dateOfBirth: formData.get("dateOfBirth"),
   });
 
@@ -44,7 +46,7 @@ export async function registerUser(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { name, email, password, dateOfBirth } = parsed.data;
+  const { name, email, password, phone, dateOfBirth } = parsed.data;
   const dob = new Date(dateOfBirth);
 
   if (!isAtLeastAge(dob, MINIMUM_AGE)) {
@@ -62,6 +64,7 @@ export async function registerUser(
       name,
       email,
       passwordHash,
+      phone,
       dateOfBirth: dob,
       ageVerified: true,
       role: ROLES.CUSTOMER,
@@ -71,7 +74,7 @@ export async function registerUser(
   await signIn("credentials", {
     email,
     password,
-    redirectTo: "/",
+    redirectTo: "/auth/verify-phone",
   });
 }
 

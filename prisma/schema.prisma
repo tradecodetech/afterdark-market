@@ -1,4 +1,4 @@
-// Prisma schema for AfterDark Market.
+// Prisma schema for Pikaboo.
 //
 // NOTE ON PROVIDER: this project ships against SQLite so it runs anywhere
 // with zero external services. SQLite does not support native enums, so
@@ -19,21 +19,41 @@ datasource db {
 // --- Users & auth -----------------------------------------------------
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         String   @default("CUSTOMER") // CUSTOMER | VENDOR | ADMIN
-  dateOfBirth  DateTime
-  ageVerified  Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          String   @default("CUSTOMER") // CUSTOMER | VENDOR | ADMIN
+  dateOfBirth   DateTime
+  ageVerified   Boolean  @default(false)
+  phone         String?
+  phoneVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
 
   vendorId String?
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  addresses Address[]
-  cart      Cart?
-  orders    Order[]
+  addresses          Address[]
+  cart               Cart?
+  orders             Order[]
+  phoneVerifications PhoneVerificationCode[]
+  rewards            Reward[]
+  groupBuyEntries    GroupBuyParticipant[]
+}
+
+// Mock OTP flow — no real SMS gateway credentials are available in this
+// project. Swap in a real provider (Twilio, Vonage, ...) by replacing
+// sendVerificationCode() in src/lib/actions/phone-actions.ts; everything
+// else (model, verify page) stays the same.
+model PhoneVerificationCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String
+  code      String
+  consumed  Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Address {
@@ -115,8 +135,15 @@ model Product {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  // Group buy: "$groupBuyPrice if groupBuyTarget people join"
+  groupBuyEnabled     Boolean @default(false)
+  groupBuyTarget      Int? // participants needed to unlock the price
+  groupBuyPrice       Int? // cents, must be < price
+  groupBuyWindowHours Int     @default(48)
+
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  groupBuySessions GroupBuySession[]
 
   @@index([vendorId, externalId])
 }
@@ -138,7 +165,51 @@ model CartItem {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int     @default(1)
 
+  // Set when this line came from a completed group buy, so checkout charges
+  // the group price instead of Product.price for this item.
+  unitPriceOverride Int?
+  groupBuySessionId String?
+
   @@unique([cartId, productId])
+}
+
+// --- Growth / gamification -----------------------------------------------
+
+model Reward {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind       String // PERCENT_OFF | FREE_SHIPPING | NONE (losing spin, still fills the daily-spin slot)
+  value      Int       @default(0) // percent (1-100) for PERCENT_OFF, ignored otherwise
+  code       String    @unique
+  redeemed   Boolean   @default(false)
+  redeemedAt DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+}
+
+model GroupBuySession {
+  id          String    @id @default(cuid())
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  targetCount Int
+  status      String    @default("OPEN") // OPEN | COMPLETED | EXPIRED
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  participants GroupBuyParticipant[]
+}
+
+model GroupBuyParticipant {
+  id        String          @id @default(cuid())
+  sessionId String
+  session   GroupBuySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime        @default(now())
+
+  @@unique([sessionId, userId])
 }
 
 // --- Orders -------------------------------------------------------------
@@ -149,6 +220,8 @@ model Order {
   user              User     @relation(fields: [userId], references: [id])
   status            String   @default("PENDING") // PENDING | PAID | FAILED | CANCELLED
   subtotal          Int
+  discountTotal     Int      @default(0)
+  appliedRewardId   String?
   shippingTotal     Int
   total             Int
   shippingLine1     String
@@ -165,19 +238,19 @@ model Order {
 }
 
 model OrderItem {
-  id                 String   @id @default(cuid())
-  orderId            String
-  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId          String
-  product            Product  @relation(fields: [productId], references: [id])
-  vendorId           String
-  vendor             Vendor   @relation(fields: [vendorId], references: [id])
-  titleSnapshot      String
-  priceSnapshot      Int
-  quantity           Int
-  fulfillmentStatus  String   @default("UNFULFILLED") // UNFULFILLED | SHIPPED | DELIVERED | CANCELLED
-  trackingNumber     String?
-  shippedAt          DateTime?
+  id                String    @id @default(cuid())
+  orderId           String
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product   @relation(fields: [productId], references: [id])
+  vendorId          String
+  vendor            Vendor    @relation(fields: [vendorId], references: [id])
+  titleSnapshot     String
+  priceSnapshot     Int
+  quantity          Int
+  fulfillmentStatus String    @default("UNFULFILLED") // UNFULFILLED | SHIPPED | DELIVERED | CANCELLED
+  trackingNumber    String?
+  shippedAt         DateTime?
 }
 
 model Payment {

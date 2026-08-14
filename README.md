@@ -1,4 +1,4 @@
-# AfterDark Market
+# Pikaboo
 
 An adult-products marketplace/dropshipping storefront — think Temu, but
 18+. Customers browse a multi-vendor catalog, checkout, and orders are
@@ -6,9 +6,8 @@ routed to the manufacturer/vendor who owns each item. Vendors can connect
 a product feed via API or manage inventory manually; admins manage
 vendors, categories, and moderation.
 
-`AfterDark Market` is a placeholder brand name — rename it via
-`NEXT_PUBLIC_SITE_NAME` in `.env` (and the `name` field in
-`package.json`) once you've settled on real branding.
+The brand name lives in `NEXT_PUBLIC_SITE_NAME` in `.env` (and the `name`
+field in `package.json`) if it ever needs to change again.
 
 ## Stack
 
@@ -37,10 +36,10 @@ Seeded by `npm run db:seed`:
 
 | Role                | Email                        | Password      |
 | ------------------- | ----------------------------- | -------------- |
-| Admin                | admin@afterdark.market        | Admin123!      |
-| Customer             | customer@afterdark.market     | Customer123!   |
-| Vendor (manual entry)| velvet@afterdark.market       | Vendor123!     |
-| Vendor (API feed)    | pulse@afterdark.market        | Vendor123!     |
+| Admin                | admin@pikaboo.app             | Admin123!      |
+| Customer             | customer@pikaboo.app          | Customer123!   |
+| Vendor (manual entry)| velvet@pikaboo.app            | Vendor123!     |
+| Vendor (API feed)    | pulse@pikaboo.app              | Vendor123!     |
 
 At checkout, use any card number except `4000000000000002` (that one
 simulates a decline) — see [Payments](#payments).
@@ -48,6 +47,8 @@ simulates a decline) — see [Payments](#payments).
 ## Core flows
 
 - **Storefront**: `/`, `/products`, `/products/[slug]`, `/cart`, `/checkout` — age-gated, discreet-shipping messaging throughout.
+- **Feed**: `/feed` — TikTok-Shop-style vertical swipe feed (CSS scroll-snap), one product per screen with an inline add-to-cart.
+- **Spin & win**: `/spin` — one free spin/day, prizes (% off, free shipping) land in the signed-in user's account and apply at checkout.
 - **Customer account**: `/account` — order history and fulfillment status per item.
 - **Vendor dashboard** (`/vendor/*`, role `VENDOR`): manage products (manual form + CSV bulk import), view/fulfill assigned orders, trigger API feed syncs.
 - **Admin dashboard** (`/admin/*`, role `ADMIN`): create/suspend vendors (including provisioning their login), manage categories, moderate products, view all orders and users.
@@ -55,6 +56,12 @@ simulates a decline) — see [Payments](#payments).
 Orders split into per-vendor `OrderItem`s at checkout, so a single
 customer order can be fulfilled by several vendors independently, each
 seeing only their own line items in their dashboard.
+
+## Growth features
+
+- **Phone verification** — required at signup (`src/lib/actions/phone-actions.ts`, `PhoneVerificationCode` model). No real SMS gateway is wired up here, so the OTP is shown on screen instead of texted (same transparent-mock approach as payments) — swap in Twilio/Vonage/etc. by replacing the "send" step; the rest of the flow (model, `/auth/verify-phone` page) doesn't change. It's a nudge, not a hard gate — the app still works if a user skips it.
+- **Spin-to-win** — `src/lib/rewards.ts` (weighted prize table) + `src/lib/actions/reward-actions.ts`. One spin per calendar day per user; results land as `Reward` rows and show up as a discount option at checkout (`src/app/checkout/CheckoutClient.tsx`).
+- **Group buy** — `Product.groupBuyEnabled/groupBuyTarget/groupBuyPrice`, `GroupBuySession`/`GroupBuyParticipant` models, `src/lib/actions/group-buy-actions.ts`. Joining a session is idempotent; once enough people join, everyone's cart gets the discounted price automatically (`CartItem.unitPriceOverride`). No invite links yet — anyone who visits the product page and clicks "Join" counts toward the target.
 
 ## Payments
 

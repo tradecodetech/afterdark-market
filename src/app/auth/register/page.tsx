@@ -6,7 +6,9 @@ export default function RegisterPage() {
     <div className="mx-auto flex max-w-sm flex-col gap-6 px-4 py-16">
       <h1 className="text-2xl font-semibold">Create account</h1>
       <p className="text-sm text-neutral-500">
-        You must be {MINIMUM_AGE} or older to register.
+        You must be {MINIMUM_AGE} or older to register. A verified phone
+        number is required — it keeps one account per person and cuts
+        down on spam and harassment.
       </p>
       <RegisterForm />
       <p className="text-sm text-neutral-500">

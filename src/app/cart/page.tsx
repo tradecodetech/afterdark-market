@@ -14,8 +14,10 @@ export default async function CartPage() {
   if (!session?.user) redirect("/auth/login?callbackUrl=/cart");
 
   const cart = await getOrCreateCart(session.user.id);
+  const unitPrice = (item: (typeof cart.items)[number]) =>
+    item.unitPriceOverride ?? item.product.price;
   const subtotal = cart.items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + unitPrice(item) * item.quantity,
     0,
   );
 
@@ -53,7 +55,12 @@ export default async function CartPage() {
                     {item.product.title}
                   </Link>
                   <p className="mt-1 text-sm text-neutral-500">
-                    {formatCents(item.product.price)}
+                    {formatCents(unitPrice(item))}
+                    {item.unitPriceOverride && (
+                      <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+                        Group buy price
+                      </span>
+                    )}
                   </p>
                   <form
                     action={updateCartItemQuantity}
@@ -78,7 +85,7 @@ export default async function CartPage() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span className="text-sm font-medium">
-                    {formatCents(item.product.price * item.quantity)}
+                    {formatCents(unitPrice(item) * item.quantity)}
                   </span>
                   <form action={removeCartItem}>
                     <input type="hidden" name="itemId" value={item.id} />

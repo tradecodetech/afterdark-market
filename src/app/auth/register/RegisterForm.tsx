@@ -29,6 +29,16 @@ export default function RegisterForm() {
         />
       </label>
       <label className="flex flex-col gap-1 text-sm">
+        Phone number
+        <input
+          type="tel"
+          name="phone"
+          required
+          placeholder="+1 555 000 0000"
+          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-sm">
         Date of birth
         <input
           type="date"

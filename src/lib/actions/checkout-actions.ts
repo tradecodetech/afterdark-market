@@ -41,6 +41,7 @@ export async function placeOrder(
   const cardNumber = formData.get("cardNumber") as string;
   const cardExpiry = formData.get("cardExpiry") as string;
   const cardCvc = formData.get("cardCvc") as string;
+  const rewardId = (formData.get("rewardId") as string) || null;
 
   if (!shippingLine1 || !shippingCity || !shippingState || !shippingPostal) {
     return { error: "Please complete your shipping address." };
@@ -49,21 +50,48 @@ export async function placeOrder(
     return { error: "Please complete your payment details." };
   }
 
+  const unitPrice = (item: (typeof cart.items)[number]) =>
+    item.unitPriceOverride ?? item.product.price;
+
   const subtotal = cart.items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + unitPrice(item) * item.quantity,
     0,
   );
   const shippingTotal = FLAT_SHIPPING_CENTS;
-  const total = subtotal + shippingTotal;
+
+  let reward: Awaited<ReturnType<typeof prisma.reward.findUnique>> = null;
+  let discountTotal = 0;
+  if (rewardId) {
+    reward = await prisma.reward.findUnique({ where: { id: rewardId } });
+    if (
+      !reward ||
+      reward.userId !== userId ||
+      reward.redeemed ||
+      reward.expiresAt < new Date() ||
+      reward.kind === "NONE"
+    ) {
+      return { error: "That reward is no longer valid." };
+    }
+    discountTotal =
+      reward.kind === "PERCENT_OFF"
+        ? Math.round((subtotal * reward.value) / 100)
+        : reward.kind === "FREE_SHIPPING"
+          ? shippingTotal
+          : 0;
+  }
+
+  const total = subtotal + shippingTotal - discountTotal;
 
   // Discreet, generic statement descriptor — never reveals product contents.
-  const billingDescriptor = "ADM* RETAIL";
+  const billingDescriptor = "PKB* RETAIL";
 
   const order = await prisma.order.create({
     data: {
       userId,
       status: ORDER_STATUS.PENDING,
       subtotal,
+      discountTotal,
+      appliedRewardId: reward?.id,
       shippingTotal,
       total,
       shippingLine1,
@@ -77,7 +105,7 @@ export async function placeOrder(
           productId: item.productId,
           vendorId: item.product.vendorId,
           titleSnapshot: item.product.title,
-          priceSnapshot: item.product.price,
+          priceSnapshot: unitPrice(item),
           quantity: item.quantity,
         })),
       },
@@ -123,6 +151,14 @@ export async function placeOrder(
       }),
     ),
     prisma.cartItem.deleteMany({ where: { cartId: cart.id } }),
+    ...(reward
+      ? [
+          prisma.reward.update({
+            where: { id: reward.id },
+            data: { redeemed: true, redeemedAt: new Date() },
+          }),
+        ]
+      : []),
   ]);
 
   redirect(`/checkout/success/${order.id}`);
