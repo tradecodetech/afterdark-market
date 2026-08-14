@@ -21,16 +21,17 @@ field in `package.json`) if it ever needs to change again.
 ## Getting started
 
 ```bash
-npm install
-npm run setup             # creates .env (if missing) and generates AUTH_SECRET
-npx prisma migrate dev    # creates prisma/dev.db and applies the schema
-npm run db:seed           # demo categories, vendors, products, and accounts
+npm install                # also creates .env and generates AUTH_SECRET (postinstall)
+npx prisma migrate dev     # creates prisma/dev.db and applies the schema
+npm run db:seed            # demo categories, vendors, products, and accounts
 npm run dev
 ```
 
-`npm run setup` is idempotent — safe to re-run any time (e.g. after
-pulling an update); it only fills in `AUTH_SECRET` if it's missing or
-empty, it won't touch one you've already set.
+`AUTH_SECRET` generation (`scripts/setup-env.mjs`) runs automatically as
+part of `npm install` — nothing to copy-paste. It's idempotent and only
+fills in a value if one is missing or empty, so it's safe on every
+install, including after pulling an update. Re-run it by hand anytime
+with `npm run setup`.
 
 Open http://localhost:3000. You'll hit the 18+ age gate first (any
 visitor, cookie-based, independent of login).
