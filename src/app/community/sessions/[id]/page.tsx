@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ROLES } from "@/lib/constants";
+import { prepareVideoSession, finishVideoSession } from "@/lib/actions/video-actions";
 
 export default async function CommunitySessionPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -38,11 +39,29 @@ export default async function CommunitySessionPage({ params }: { params: Promise
         <div className="mt-8 rounded-2xl bg-neutral-50 p-6 dark:bg-neutral-900">
           <h2 className="font-semibold">Video room</h2>
           <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-            The session is structurally ready for a video provider. Live camera transport, access tokens, recording controls, moderation, and provider webhooks will be attached here before production use.
+            The room is created server-side when an authorized participant starts the scheduled session. The provider adapter is deliberately isolated from Pikaboo’s business logic.
           </p>
-          <button disabled={!ready} className="mt-5 rounded-xl bg-black px-5 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-black">
-            {item.status !== "SCHEDULED" ? "Session unavailable" : ready ? "Join video room (provider pending)" : "Room opens at scheduled time"}
-          </button>
+
+          {item.status === "ACTIVE" ? (
+            <div className="mt-5 flex flex-wrap gap-3">
+              <div className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm dark:border-neutral-700 dark:bg-black">Video provider room: <span className="font-mono">{item.providerSessionId}</span></div>
+              <form action={finishVideoSession}>
+                <input type="hidden" name="sessionId" value={item.id} />
+                <button className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-medium dark:border-neutral-700">End session</button>
+              </form>
+            </div>
+          ) : item.status === "COMPLETED" ? (
+            <div className="mt-5 rounded-xl border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-700">
+              Session completed{item.durationSeconds != null ? ` · ${Math.round(item.durationSeconds / 60)} min` : ""}.
+            </div>
+          ) : (
+            <form action={prepareVideoSession} className="mt-5">
+              <input type="hidden" name="sessionId" value={item.id} />
+              <button disabled={!ready} className="rounded-xl bg-black px-5 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-black">
+                {ready ? "Start secure video room" : "Room opens at scheduled time"}
+              </button>
+            </form>
+          )}
         </div>
       </section>
     </main>
