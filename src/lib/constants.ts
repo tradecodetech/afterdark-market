@@ -5,6 +5,7 @@ export const AUTH_COOKIE_MAX_AGE_DAYS = 30;
 
 export const ROLES = {
   CUSTOMER: "CUSTOMER",
+  CREATOR: "CREATOR",
   VENDOR: "VENDOR",
   ADMIN: "ADMIN",
 } as const;
@@ -41,6 +42,34 @@ export const PAYMENT_STATUS = {
   REFUNDED: "REFUNDED",
 } as const;
 export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
+
+export const CONTACT_REQUEST_STATUS = {
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  DECLINED: "DECLINED",
+  CANCELLED: "CANCELLED",
+  EXPIRED: "EXPIRED",
+} as const;
+export type ContactRequestStatus =
+  (typeof CONTACT_REQUEST_STATUS)[keyof typeof CONTACT_REQUEST_STATUS];
+
+export const VIDEO_SESSION_STATUS = {
+  SCHEDULED: "SCHEDULED",
+  ACTIVE: "ACTIVE",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+  NO_SHOW: "NO_SHOW",
+} as const;
+export type VideoSessionStatus =
+  (typeof VIDEO_SESSION_STATUS)[keyof typeof VIDEO_SESSION_STATUS];
+
+export const GIFT_STATUS = {
+  PENDING: "PENDING",
+  CAPTURED: "CAPTURED",
+  REFUNDED: "REFUNDED",
+  FAILED: "FAILED",
+} as const;
+export type GiftStatus = (typeof GIFT_STATUS)[keyof typeof GIFT_STATUS];
 
 export function formatCents(cents: number): string {
   return (cents / 100).toLocaleString("en-US", {
