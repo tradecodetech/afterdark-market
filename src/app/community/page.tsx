@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 
 const steps = [
   {
@@ -19,7 +20,11 @@ const steps = [
   },
 ];
 
-export default function CommunityPage() {
+export default async function CommunityPage() {
+  const session = await auth();
+  const communityHref = session?.user ? "/community/creators" : "/auth/login?callbackUrl=/community/creators";
+  const communityLabel = session?.user ? "Discover creators" : "Sign in to discover creators";
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <section className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8 dark:border-neutral-800 dark:bg-neutral-950 sm:p-12">
@@ -28,11 +33,11 @@ export default function CommunityPage() {
           Connect with creators. Request private time. Send gifts.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-600 dark:text-neutral-400">
-          The community layer is being built as a separate experience from the marketplace so creator profiles, paid contact requests, private sessions, gifts, and creator earnings can evolve without changing the store checkout.
+          Discover approved creators, send paid connection requests, and continue into scheduled private sessions when accepted.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/auth/login" className="rounded-full bg-black px-5 py-3 text-sm font-medium text-white hover:opacity-80 dark:bg-white dark:text-black">
-            Sign in to continue
+          <Link href={communityHref} className="rounded-full bg-black px-5 py-3 text-sm font-medium text-white hover:opacity-80 dark:bg-white dark:text-black">
+            {communityLabel}
           </Link>
           <Link href="/products" className="rounded-full border border-neutral-300 px-5 py-3 text-sm font-medium hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900">
             Continue shopping
