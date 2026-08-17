@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:creator": "node scripts/seed-demo-creator.mjs",
     "setup": "node scripts/setup-env.mjs",
     "postinstall": "node scripts/setup-env.mjs"
   },
