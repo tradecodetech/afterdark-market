@@ -37,7 +37,8 @@ export default async function CreatorDashboardPage() {
         </div>
         <div className="flex gap-3">
           <Link href="/creator/requests" className="rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium dark:border-neutral-700">Requests</Link>
-          <Link href="/creator/sessions" className="rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black">Sessions</Link>
+          <Link href="/creator/sessions" className="rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium dark:border-neutral-700">Sessions</Link>
+          <Link href="/creator/earnings" className="rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black">Earnings</Link>
         </div>
       </div>
 
