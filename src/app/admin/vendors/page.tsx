@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { toggleVendorApproved } from "@/lib/actions/admin-actions";
 import NewVendorForm from "./NewVendorForm";
@@ -33,7 +34,11 @@ export default async function AdminVendorsPage() {
             <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
               {vendors.map((vendor) => (
                 <tr key={vendor.id}>
-                  <td className="py-2 pr-2">{vendor.name}</td>
+                  <td className="py-2 pr-2">
+                    <Link href={`/admin/vendors/${vendor.id}`} className="hover:underline">
+                      {vendor.name}
+                    </Link>
+                  </td>
                   <td className="py-2 pr-2 text-neutral-500">
                     {vendor.integrationType}
                   </td>
@@ -41,7 +46,10 @@ export default async function AdminVendorsPage() {
                   <td className="py-2 pr-2">
                     {vendor.approved ? "Approved" : "Suspended"}
                   </td>
-                  <td className="py-2">
+                  <td className="flex gap-3 py-2">
+                    <Link href={`/admin/vendors/${vendor.id}`} className="text-xs underline">
+                      Edit
+                    </Link>
                     <form action={toggleVendorApproved}>
                       <input type="hidden" name="vendorId" value={vendor.id} />
                       <button type="submit" className="text-xs underline">

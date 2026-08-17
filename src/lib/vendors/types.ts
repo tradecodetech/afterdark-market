@@ -11,6 +11,17 @@ export type VendorProductInput = {
   categorySlug: string;
 };
 
+export const VENDOR_FEED_FIELDS = [
+  "externalId",
+  "title",
+  "description",
+  "price",
+  "stock",
+  "sku",
+  "imageUrl",
+  "categorySlug",
+] as const satisfies readonly (keyof VendorProductInput)[];
+
 export interface VendorAdapter {
   fetchProducts(vendor: {
     id: string;

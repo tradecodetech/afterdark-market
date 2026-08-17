@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
+import { syncVendorFromApi } from "@/lib/vendors/sync";
+import { VENDOR_FEED_FIELDS } from "@/lib/vendors/types";
 import { ROLES, VENDOR_INTEGRATION } from "@/lib/constants";
 
 async function requireAdmin() {
@@ -102,6 +104,67 @@ export async function createCategory(
   revalidatePath("/admin/categories");
   revalidatePath("/");
   return { success: `Category "${name}" created.` };
+}
+
+export async function updateVendor(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireAdmin();
+
+  const vendorId = formData.get("vendorId") as string;
+  const name = formData.get("name") as string;
+  const contactEmail = formData.get("contactEmail") as string;
+  const integrationType = formData.get("integrationType") as string;
+  const discreetLabel = (formData.get("discreetLabel") as string) || "Plain Box Co.";
+  const apiBaseUrl = (formData.get("apiBaseUrl") as string) || null;
+  const apiKey = (formData.get("apiKey") as string) || null;
+
+  if (!vendorId || !name || !contactEmail) {
+    return { error: "Vendor name and contact email are required." };
+  }
+  if (integrationType === VENDOR_INTEGRATION.API && !apiBaseUrl) {
+    return { error: "API-integrated vendors need a feed URL." };
+  }
+
+  const mapping: Record<string, string> = {};
+  for (const field of VENDOR_FEED_FIELDS) {
+    const value = (formData.get(`map_${field}`) as string)?.trim();
+    if (value && value !== field) mapping[field] = value;
+  }
+  const fieldMapping = Object.keys(mapping).length > 0 ? JSON.stringify(mapping) : null;
+
+  await prisma.vendor.update({
+    where: { id: vendorId },
+    data: {
+      name,
+      contactEmail,
+      integrationType,
+      discreetLabel,
+      apiBaseUrl: integrationType === VENDOR_INTEGRATION.API ? apiBaseUrl : null,
+      apiKey: integrationType === VENDOR_INTEGRATION.API ? apiKey : null,
+      fieldMapping: integrationType === VENDOR_INTEGRATION.API ? fieldMapping : null,
+    },
+  });
+
+  revalidatePath(`/admin/vendors/${vendorId}`);
+  revalidatePath("/admin/vendors");
+  return { success: "Vendor updated." };
+}
+
+export async function adminTriggerSync(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireAdmin();
+  const vendorId = formData.get("vendorId") as string;
+
+  const result = await syncVendorFromApi(vendorId);
+
+  revalidatePath(`/admin/vendors/${vendorId}`);
+  return result.success
+    ? { success: `Synced ${result.itemsSynced} products.` }
+    : { error: result.message };
 }
 
 export async function adminToggleProductActive(formData: FormData) {
