@@ -31,48 +31,34 @@ export default async function Header() {
           {SITE_NAME}
         </Link>
         <nav className="flex items-center gap-5 text-sm">
-          <Link href="/products" className="hover:opacity-70">
-            Shop
-          </Link>
-          <Link href="/feed" className="hover:opacity-70">
-            Feed
-          </Link>
-          <Link href="/spin" className="hover:opacity-70">
-            Spin & Win
-          </Link>
+          <Link href="/products" className="hover:opacity-70">Shop</Link>
+          <Link href="/community" className="hover:opacity-70">Community</Link>
+          <Link href="/feed" className="hover:opacity-70">Feed</Link>
+          <Link href="/spin" className="hover:opacity-70">Spin & Win</Link>
+          {session?.user?.role === ROLES.CREATOR && (
+            <Link href="/creator" className="hover:opacity-70">Creator Dashboard</Link>
+          )}
           {session?.user?.role === ROLES.VENDOR && (
-            <Link href="/vendor" className="hover:opacity-70">
-              Vendor Dashboard
-            </Link>
+            <Link href="/vendor" className="hover:opacity-70">Vendor Dashboard</Link>
           )}
           {session?.user?.role === ROLES.ADMIN && (
-            <Link href="/admin" className="hover:opacity-70">
-              Admin
-            </Link>
+            <Link href="/admin" className="hover:opacity-70">Admin</Link>
           )}
           <Link href="/cart" className="hover:opacity-70">
             Cart{cartCount > 0 ? ` (${cartCount})` : ""}
           </Link>
           {session?.user ? (
             <>
-              <Link href="/account" className="hover:opacity-70">
-                Account
-              </Link>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
-                <button type="submit" className="hover:opacity-70">
-                  Sign out
-                </button>
+              <Link href="/account" className="hover:opacity-70">Account</Link>
+              <form action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/" });
+              }}>
+                <button type="submit" className="hover:opacity-70">Sign out</button>
               </form>
             </>
           ) : (
-            <Link href="/auth/login" className="hover:opacity-70">
-              Sign in
-            </Link>
+            <Link href="/auth/login" className="hover:opacity-70">Sign in</Link>
           )}
         </nav>
       </div>
