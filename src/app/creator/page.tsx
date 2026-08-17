@@ -12,6 +12,7 @@ export default async function CreatorDashboardPage() {
   const profile = await prisma.creatorProfile.findUnique({ where: { userId: session.user.id } });
   const pendingCount = await prisma.contactRequest.count({ where: { creatorId: session.user.id, status: "PENDING" } });
   const acceptedCount = await prisma.contactRequest.count({ where: { creatorId: session.user.id, status: "ACCEPTED" } });
+  const scheduledCount = await prisma.videoSession.count({ where: { creatorId: session.user.id, status: "SCHEDULED" } });
   const earnings = await prisma.creatorEarning.aggregate({
     where: { creatorId: session.user.id, status: { in: ["PENDING", "AVAILABLE"] } },
     _sum: { netAmount: true },
@@ -32,15 +33,19 @@ export default async function CreatorDashboardPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Creator dashboard</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Welcome, {profile.displayName}</h1>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Manage requests now. Scheduling, live video, gifts, and payouts plug into this dashboard next.</p>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Manage requests and scheduled private sessions from one place.</p>
         </div>
-        <Link href="/creator/requests" className="rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black">View requests</Link>
+        <div className="flex gap-3">
+          <Link href="/creator/requests" className="rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium dark:border-neutral-700">Requests</Link>
+          <Link href="/creator/sessions" className="rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black">Sessions</Link>
+        </div>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-4">
         <div className="rounded-2xl border border-neutral-200 p-5 dark:border-neutral-800"><div className="text-xs text-neutral-500">Pending requests</div><div className="mt-2 text-3xl font-semibold">{pendingCount}</div></div>
         <div className="rounded-2xl border border-neutral-200 p-5 dark:border-neutral-800"><div className="text-xs text-neutral-500">Accepted requests</div><div className="mt-2 text-3xl font-semibold">{acceptedCount}</div></div>
-        <div className="rounded-2xl border border-neutral-200 p-5 dark:border-neutral-800"><div className="text-xs text-neutral-500">Tracked creator earnings</div><div className="mt-2 text-3xl font-semibold">${((earnings._sum.netAmount ?? 0) / 100).toFixed(2)}</div></div>
+        <div className="rounded-2xl border border-neutral-200 p-5 dark:border-neutral-800"><div className="text-xs text-neutral-500">Scheduled sessions</div><div className="mt-2 text-3xl font-semibold">{scheduledCount}</div></div>
+        <div className="rounded-2xl border border-neutral-200 p-5 dark:border-neutral-800"><div className="text-xs text-neutral-500">Tracked earnings</div><div className="mt-2 text-3xl font-semibold">${((earnings._sum.netAmount ?? 0) / 100).toFixed(2)}</div></div>
       </div>
 
       <section className="mt-8 rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
