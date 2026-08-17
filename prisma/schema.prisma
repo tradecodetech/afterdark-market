@@ -41,10 +41,6 @@ model User {
   groupBuyEntries    GroupBuyParticipant[]
 }
 
-// Mock OTP flow — no real SMS gateway credentials are available in this
-// project. Swap in a real provider (Twilio, Vonage, ...) by replacing
-// sendVerificationCode() in src/lib/actions/phone-actions.ts; everything
-// else (model, verify page) stays the same.
 model PhoneVerificationCode {
   id        String   @id @default(cuid())
   userId    String
@@ -59,7 +55,7 @@ model PhoneVerificationCode {
 model Address {
   id        String  @id @default(cuid())
   userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   label     String  @default("Home")
   line1     String
   line2     String?
@@ -70,18 +66,16 @@ model Address {
   isDefault Boolean @default(false)
 }
 
-// --- Vendors ------------------------------------------------------------
-
 model Vendor {
   id              String   @id @default(cuid())
   name            String
   slug            String   @unique
   contactEmail    String
-  integrationType String   @default("MANUAL") // MANUAL | API
-  discreetLabel   String   @default("Plain Box Co.") // shows on discreet packaging/billing
+  integrationType String   @default("MANUAL")
+  discreetLabel   String   @default("Plain Box Co.")
   apiBaseUrl      String?
   apiKey          String?
-  fieldMapping    String? // JSON string mapping vendor feed fields -> our Product fields
+  fieldMapping    String?
   approved        Boolean  @default(true)
   createdAt       DateTime @default(now())
 
@@ -97,12 +91,10 @@ model VendorSyncLog {
   vendor       Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   startedAt    DateTime  @default(now())
   finishedAt   DateTime?
-  status       String    @default("RUNNING") // RUNNING | SUCCESS | ERROR
+  status       String    @default("RUNNING")
   itemsSynced  Int       @default(0)
   errorMessage String?
 }
-
-// --- Catalog --------------------------------------------------------------
 
 model Category {
   id       String     @id @default(cuid())
@@ -123,32 +115,26 @@ model Product {
   title             String
   slug              String   @unique
   description       String
-  price             Int // cents
+  price             Int
   compareAtPrice    Int?
   sku               String
   stock             Int      @default(0)
   imageUrl          String
   discreetPackaging Boolean  @default(true)
   isActive          Boolean  @default(true)
-  source            String   @default("MANUAL") // MANUAL | API
-  externalId        String? // id from vendor's API feed, for upserts on sync
+  source            String   @default("MANUAL")
+  externalId        String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
-  // Group buy: "$groupBuyPrice if groupBuyTarget people join"
   groupBuyEnabled     Boolean @default(false)
-  groupBuyTarget      Int? // participants needed to unlock the price
-  groupBuyPrice       Int? // cents, must be < price
+  groupBuyTarget      Int?
+  groupBuyPrice       Int?
   groupBuyWindowHours Int     @default(48)
-
   cartItems        CartItem[]
   orderItems       OrderItem[]
   groupBuySessions GroupBuySession[]
-
   @@index([vendorId, externalId])
 }
-
-// --- Cart -------------------------------------------------------------
 
 model Cart {
   id     String     @id @default(cuid())
@@ -164,23 +150,17 @@ model CartItem {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int     @default(1)
-
-  // Set when this line came from a completed group buy, so checkout charges
-  // the group price instead of Product.price for this item.
   unitPriceOverride Int?
   groupBuySessionId String?
-
   @@unique([cartId, productId])
 }
-
-// --- Growth / gamification -----------------------------------------------
 
 model Reward {
   id         String    @id @default(cuid())
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind       String // PERCENT_OFF | FREE_SHIPPING | NONE (losing spin, still fills the daily-spin slot)
-  value      Int       @default(0) // percent (1-100) for PERCENT_OFF, ignored otherwise
+  kind       String
+  value      Int       @default(0)
   code       String    @unique
   redeemed   Boolean   @default(false)
   redeemedAt DateTime?
@@ -193,11 +173,10 @@ model GroupBuySession {
   productId   String
   product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   targetCount Int
-  status      String    @default("OPEN") // OPEN | COMPLETED | EXPIRED
+  status      String    @default("OPEN")
   expiresAt   DateTime
   createdAt   DateTime  @default(now())
   completedAt DateTime?
-
   participants GroupBuyParticipant[]
 }
 
@@ -208,17 +187,14 @@ model GroupBuyParticipant {
   userId    String
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   joinedAt  DateTime        @default(now())
-
   @@unique([sessionId, userId])
 }
-
-// --- Orders -------------------------------------------------------------
 
 model Order {
   id                String   @id @default(cuid())
   userId            String
   user              User     @relation(fields: [userId], references: [id])
-  status            String   @default("PENDING") // PENDING | PAID | FAILED | CANCELLED
+  status            String   @default("PENDING")
   subtotal          Int
   discountTotal     Int      @default(0)
   appliedRewardId   String?
@@ -230,9 +206,8 @@ model Order {
   shippingState     String
   shippingPostal    String
   shippingCountry   String   @default("US")
-  billingDescriptor String // discreet statement descriptor shown to the customer
+  billingDescriptor String
   createdAt         DateTime @default(now())
-
   items    OrderItem[]
   payments Payment[]
 }
@@ -248,7 +223,7 @@ model OrderItem {
   titleSnapshot     String
   priceSnapshot     Int
   quantity          Int
-  fulfillmentStatus String    @default("UNFULFILLED") // UNFULFILLED | SHIPPED | DELIVERED | CANCELLED
+  fulfillmentStatus String    @default("UNFULFILLED")
   trackingNumber    String?
   shippedAt         DateTime?
 }
@@ -257,9 +232,103 @@ model Payment {
   id          String   @id @default(cuid())
   orderId     String
   order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider    String   @default("mock") // mock | ccbill | segpay | epoch
+  provider    String   @default("mock")
   providerRef String
-  status      String // AUTHORIZED | CAPTURED | FAILED | REFUNDED
+  status      String
   amount      Int
   createdAt   DateTime @default(now())
+}
+
+// --- Creator community foundation --------------------------------------
+// IDs are intentionally scalar in this first migration. This keeps the
+// marketplace schema isolated while the community payment/video providers
+// are still being selected.
+
+model CreatorProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  displayName      String
+  bio              String?
+  avatarUrl        String?
+  contactFee       Int      @default(0)
+  sessionRate      Int      @default(0)
+  isAvailable      Boolean  @default(false)
+  isApproved       Boolean  @default(false)
+  identityVerified Boolean  @default(false)
+  ageVerified      Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([isApproved, isAvailable])
+}
+
+model ContactRequest {
+  id               String   @id @default(cuid())
+  requesterId      String
+  creatorId        String
+  creatorProfileId String
+  fee              Int      @default(0)
+  status           String   @default("PENDING")
+  paymentRef       String?
+  expiresAt        DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([creatorId, status])
+  @@index([requesterId, status])
+}
+
+model VideoSession {
+  id                String   @id @default(cuid())
+  contactRequestId  String?
+  customerId        String
+  creatorId         String
+  creatorProfileId  String
+  status            String   @default("SCHEDULED")
+  rate              Int      @default(0)
+  platformFee       Int      @default(0)
+  creatorAmount     Int      @default(0)
+  provider          String?
+  providerSessionId String?
+  scheduledAt       DateTime?
+  startedAt         DateTime?
+  endedAt           DateTime?
+  durationSeconds   Int?
+  createdAt         DateTime @default(now())
+
+  @@index([creatorId, status])
+  @@index([customerId, status])
+}
+
+model Gift {
+  id               String   @id @default(cuid())
+  senderId         String
+  recipientId      String
+  creatorProfileId String
+  videoSessionId   String?
+  amount           Int
+  label            String
+  status           String   @default("PENDING")
+  providerRef      String?
+  createdAt        DateTime @default(now())
+
+  @@index([recipientId, createdAt])
+  @@index([videoSessionId])
+}
+
+model CreatorEarning {
+  id               String   @id @default(cuid())
+  creatorId        String
+  creatorProfileId String
+  videoSessionId   String?
+  giftId           String?
+  grossAmount      Int
+  platformFee      Int      @default(0)
+  netAmount        Int
+  status           String   @default("PENDING")
+  availableAt      DateTime?
+  paidAt           DateTime?
+  createdAt        DateTime @default(now())
+
+  @@index([creatorId, status])
 }
