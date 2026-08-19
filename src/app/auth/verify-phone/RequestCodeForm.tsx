@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { requestPhoneCode } from "@/lib/actions/phone-actions";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import Button from "@/components/ui/Button";
 
 export default function RequestCodeForm({
   defaultPhone,
@@ -14,30 +16,26 @@ export default function RequestCodeForm({
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-2">
-      <label className="flex flex-col gap-1 text-sm">
+    <form action={formAction} className="flex flex-col gap-3">
+      <label className={labelClass()}>
         Phone number
         <input
           type="tel"
           name="phone"
           required
           defaultValue={defaultPhone}
-          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+          className={fieldClass()}
         />
       </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
-      >
+      <Button type="submit" variant="secondary" disabled={pending} className="self-start">
         {pending ? "Sending…" : "Send code"}
-      </button>
+      </Button>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && (
         <p className="text-sm text-green-600">{state.success}</p>
       )}
       {state?.devCode && (
-        <p className="rounded-md border border-dashed border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">
+        <p className="rounded-xl border border-dashed border-brand-300 bg-brand-50 px-3 py-2 text-sm dark:border-brand-700 dark:bg-brand-950/40">
           Demo code: <span className="font-mono font-semibold">{state.devCode}</span>
         </p>
       )}

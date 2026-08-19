@@ -33,7 +33,7 @@ export default async function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-2xl font-semibold">Checkout</h1>
+      <h1 className="font-display text-2xl tracking-tight">Checkout</h1>
       <p className="mt-1 text-sm text-neutral-500">
         Shipping is discreet. Your billing statement will read{" "}
         <span className="font-medium">&ldquo;PKB* RETAIL&rdquo;</span>.

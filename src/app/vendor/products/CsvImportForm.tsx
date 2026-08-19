@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { importCsvAction } from "@/lib/actions/vendor-actions";
+import Button from "@/components/ui/Button";
 
 export default function CsvImportForm() {
   const [state, formAction, pending] = useActionState(importCsvAction, undefined);
@@ -20,13 +21,9 @@ export default function CsvImportForm() {
       />
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && <p className="text-sm text-green-600">{state.success}</p>}
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
-      >
+      <Button type="submit" variant="secondary" disabled={pending} className="self-start">
         {pending ? "Importing…" : "Import CSV"}
-      </button>
+      </Button>
     </form>
   );
 }

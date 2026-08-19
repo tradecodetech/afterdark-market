@@ -8,6 +8,10 @@ import {
   updateCartItemQuantity,
 } from "@/lib/actions/cart-actions";
 import { formatCents } from "@/lib/constants";
+import { fieldClass } from "@/components/ui/field";
+import { textLinkClass } from "@/components/ui/button";
+import Badge from "@/components/ui/Badge";
+import ButtonLink from "@/components/ui/ButtonLink";
 
 export default async function CartPage() {
   const session = await auth();
@@ -23,22 +27,22 @@ export default async function CartPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-2xl font-semibold">Your cart</h1>
+      <h1 className="font-display text-2xl tracking-tight">Your cart</h1>
 
       {cart.items.length === 0 ? (
-        <div className="mt-8 text-sm text-neutral-500">
-          Your cart is empty.{" "}
-          <Link href="/products" className="underline">
+        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-neutral-300 py-16 text-center dark:border-neutral-700">
+          <span className="text-3xl">🛒</span>
+          <p className="text-sm text-neutral-500">Your cart is empty.</p>
+          <ButtonLink href="/products" variant="secondary">
             Browse products
-          </Link>
-          .
+          </ButtonLink>
         </div>
       ) : (
         <>
           <ul className="mt-8 divide-y divide-neutral-200 dark:divide-neutral-800">
             {cart.items.map((item) => (
               <li key={item.id} className="flex items-center gap-4 py-4">
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900">
                   <Image
                     src={item.product.imageUrl}
                     alt={item.product.title}
@@ -54,13 +58,9 @@ export default async function CartPage() {
                   >
                     {item.product.title}
                   </Link>
-                  <p className="mt-1 text-sm text-neutral-500">
+                  <p className="mt-1 flex items-center gap-2 text-sm text-neutral-500">
                     {formatCents(unitPrice(item))}
-                    {item.unitPriceOverride && (
-                      <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-                        Group buy price
-                      </span>
-                    )}
+                    {item.unitPriceOverride && <Badge tone="brand">Group buy price</Badge>}
                   </p>
                   <form
                     action={updateCartItemQuantity}
@@ -73,12 +73,9 @@ export default async function CartPage() {
                       defaultValue={item.quantity}
                       min={0}
                       max={item.product.stock}
-                      className="w-16 rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+                      className={fieldClass("w-16 px-2 py-1")}
                     />
-                    <button
-                      type="submit"
-                      className="text-xs underline text-neutral-500"
-                    >
+                    <button type="submit" className={textLinkClass()}>
                       Update
                     </button>
                   </form>
@@ -89,10 +86,7 @@ export default async function CartPage() {
                   </span>
                   <form action={removeCartItem}>
                     <input type="hidden" name="itemId" value={item.id} />
-                    <button
-                      type="submit"
-                      className="text-xs text-red-600 underline"
-                    >
+                    <button type="submit" className={textLinkClass("danger")}>
                       Remove
                     </button>
                   </form>
@@ -108,12 +102,9 @@ export default async function CartPage() {
             </span>
           </div>
 
-          <Link
-            href="/checkout"
-            className="mt-6 block w-full rounded-md bg-black py-3 text-center text-sm font-medium text-white dark:bg-white dark:text-black"
-          >
+          <ButtonLink href="/checkout" size="lg" className="mt-6 w-full">
             Proceed to checkout
-          </Link>
+          </ButtonLink>
         </>
       )}
     </div>

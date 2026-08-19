@@ -3,6 +3,9 @@
 import { useActionState } from "react";
 import type { VendorSyncLog } from "@prisma/client";
 import { adminTriggerSync } from "@/lib/actions/admin-actions";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 
 export default function SyncPanel({
   vendorId,
@@ -14,17 +17,13 @@ export default function SyncPanel({
   const [state, formAction, pending] = useActionState(adminTriggerSync, undefined);
 
   return (
-    <div className="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+    <Card>
       <h3 className="text-sm font-semibold">Sync</h3>
       <form action={formAction} className="mt-2">
         <input type="hidden" name="vendorId" value={vendorId} />
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
-        >
+        <Button type="submit" disabled={pending}>
           {pending ? "Syncing…" : "Sync now"}
-        </button>
+        </Button>
       </form>
       {state?.error && <p className="mt-2 text-sm text-red-600">{state.error}</p>}
       {state?.success && <p className="mt-2 text-sm text-green-600">{state.success}</p>}
@@ -33,25 +32,21 @@ export default function SyncPanel({
         {logs.map((log) => (
           <li
             key={log.id}
-            className="flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2 dark:border-neutral-800"
+            className="flex items-center justify-between rounded-xl border border-neutral-200 px-3 py-2 dark:border-neutral-800"
           >
             <span>{new Date(log.startedAt).toLocaleString()}</span>
-            <span
-              className={
-                log.status === "SUCCESS"
-                  ? "text-green-600"
-                  : log.status === "ERROR"
-                    ? "text-red-600"
-                    : "text-neutral-500"
+            <Badge
+              tone={
+                log.status === "SUCCESS" ? "success" : log.status === "ERROR" ? "danger" : "neutral"
               }
             >
               {log.status} — {log.itemsSynced} synced
               {log.errorMessage ? `: ${log.errorMessage}` : ""}
-            </span>
+            </Badge>
           </li>
         ))}
         {logs.length === 0 && <p className="text-sm text-neutral-500">No syncs yet.</p>}
       </ul>
-    </div>
+    </Card>
   );
 }

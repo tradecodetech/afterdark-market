@@ -16,22 +16,28 @@ export default async function VendorLayout({
   });
   if (!vendor) redirect("/");
 
+  const links = [
+    { href: "/vendor/products", label: "Products" },
+    { href: "/vendor/orders", label: "Orders" },
+    ...(vendor.integrationType === "API"
+      ? [{ href: "/vendor/integrations", label: "API integration" }]
+      : []),
+  ];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-2xl font-semibold">{vendor.name}</h1>
+      <h1 className="font-display text-2xl tracking-tight">{vendor.name}</h1>
       <p className="text-sm text-neutral-500">Vendor dashboard</p>
-      <nav className="mt-4 flex gap-4 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
-        <Link href="/vendor/products" className="hover:underline">
-          Products
-        </Link>
-        <Link href="/vendor/orders" className="hover:underline">
-          Orders
-        </Link>
-        {vendor.integrationType === "API" && (
-          <Link href="/vendor/integrations" className="hover:underline">
-            API integration
+      <nav className="mt-5 flex gap-1 border-b border-neutral-200 text-sm dark:border-neutral-800">
+        {links.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="border-b-2 border-transparent px-3 pb-3 font-medium text-neutral-600 transition hover:border-brand-300 hover:text-brand-600 dark:text-neutral-400 dark:hover:text-brand-400"
+          >
+            {link.label}
           </Link>
-        )}
+        ))}
       </nav>
       <div className="mt-6">{children}</div>
     </div>

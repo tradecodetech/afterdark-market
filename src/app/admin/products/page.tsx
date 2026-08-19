@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/constants";
 import { adminToggleProductActive } from "@/lib/actions/admin-actions";
+import Badge from "@/components/ui/Badge";
+import { textLinkClass } from "@/components/ui/button";
 
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
@@ -32,11 +34,15 @@ export default async function AdminProductsPage() {
                 <td className="py-2 pr-2 text-neutral-500">{product.category.name}</td>
                 <td className="py-2 pr-2">{formatCents(product.price)}</td>
                 <td className="py-2 pr-2">{product.stock}</td>
-                <td className="py-2 pr-2">{product.isActive ? "Active" : "Hidden"}</td>
+                <td className="py-2 pr-2">
+                  <Badge tone={product.isActive ? "success" : "neutral"}>
+                    {product.isActive ? "Active" : "Hidden"}
+                  </Badge>
+                </td>
                 <td className="py-2">
                   <form action={adminToggleProductActive}>
                     <input type="hidden" name="productId" value={product.id} />
-                    <button type="submit" className="text-xs underline">
+                    <button type="submit" className={textLinkClass()}>
                       {product.isActive ? "Hide" : "Activate"}
                     </button>
                   </form>

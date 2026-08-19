@@ -3,15 +3,19 @@
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { spinWheel } from "@/lib/actions/reward-actions";
 import { PRIZES } from "@/lib/rewards";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
 
 const SLICE_DEGREES = 360 / PRIZES.length;
+// On-brand wheel palette — alternating violet/rose shades instead of a
+// generic rainbow, matching the brand/accent tokens in globals.css.
 const SLICE_COLORS = [
-  "#f43f5e",
-  "#8b5cf6",
-  "#0ea5e9",
-  "#334155",
-  "#f59e0b",
-  "#10b981",
+  "#e11d48", // accent-600
+  "#7c3aed", // brand-600
+  "#fb7185", // accent-400
+  "#3b0764", // brand-900
+  "#a78bfa", // brand-400
+  "#6d28d9", // brand-700
 ];
 
 function conicGradient() {
@@ -83,19 +87,15 @@ export default function SpinWheel({ alreadySpun }: { alreadySpun: boolean }) {
           setSpinCount((c) => c + 1);
         }}
       >
-        <button
-          type="submit"
-          disabled={pending || alreadySpun}
-          className="rounded-full bg-black px-8 py-3 text-sm font-medium text-white disabled:opacity-40 dark:bg-white dark:text-black"
-        >
+        <Button type="submit" disabled={pending || alreadySpun} size="lg">
           {alreadySpun ? "Come back tomorrow" : pending ? "Spinning…" : "Spin"}
-        </button>
+        </Button>
       </form>
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       {revealed && state?.label && (
-        <div className="rounded-xl border border-neutral-200 px-5 py-4 text-center dark:border-neutral-800">
+        <Card className="text-center">
           <p className="font-semibold">{state.label}!</p>
           {state.code && state.label !== "Try again tomorrow" && (
             <p className="mt-1 text-sm text-neutral-500">
@@ -103,7 +103,7 @@ export default function SpinWheel({ alreadySpun }: { alreadySpun: boolean }) {
               <span className="font-mono">{state.code}</span>
             </p>
           )}
-        </div>
+        </Card>
       )}
     </div>
   );

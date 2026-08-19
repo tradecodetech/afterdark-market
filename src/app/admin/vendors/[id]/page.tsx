@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import Card from "@/components/ui/Card";
 import VendorEditForm from "./VendorEditForm";
 import SyncPanel from "./SyncPanel";
 
@@ -23,11 +24,11 @@ export default async function AdminVendorEditPage({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h2 className="text-lg font-semibold">{vendor.name}</h2>
+        <h2 className="font-display text-lg tracking-tight">{vendor.name}</h2>
         <p className="text-sm text-neutral-500">Edit vendor & API integration</p>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 p-5 text-sm dark:border-neutral-800">
+      <Card className="text-sm">
         <h3 className="font-semibold">What to get from a vendor before connecting their API</h3>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-neutral-600 dark:text-neutral-400">
           <li>A product feed URL that returns JSON (a REST endpoint, not a PDF/spreadsheet they email you)</li>
@@ -42,7 +43,7 @@ export default async function AdminVendorEditPage({
           Manual/CSV vendors don&apos;t need any of this — just switch integration
           type to Manual below.
         </p>
-      </div>
+      </Card>
 
       <VendorEditForm vendor={vendor} />
 

@@ -2,6 +2,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/constants";
 import { toggleProductActive, deleteVendorProduct } from "@/lib/actions/vendor-actions";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import { textLinkClass } from "@/components/ui/button";
 import NewProductForm from "./NewProductForm";
 import CsvImportForm from "./CsvImportForm";
 
@@ -20,18 +23,18 @@ export default async function VendorProductsPage() {
   return (
     <div className="flex flex-col gap-10">
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+        <Card>
           <h2 className="text-sm font-semibold">Add product manually</h2>
           <div className="mt-3">
             <NewProductForm categories={categories} />
           </div>
-        </div>
-        <div className="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+        </Card>
+        <Card>
           <h2 className="text-sm font-semibold">Bulk import via CSV</h2>
           <div className="mt-3">
             <CsvImportForm />
           </div>
-        </div>
+        </Card>
       </div>
 
       <div>
@@ -58,18 +61,20 @@ export default async function VendorProductsPage() {
                   <td className="py-2 pr-2">{product.stock}</td>
                   <td className="py-2 pr-2 text-neutral-500">{product.source}</td>
                   <td className="py-2 pr-2">
-                    {product.isActive ? "Active" : "Hidden"}
+                    <Badge tone={product.isActive ? "success" : "neutral"}>
+                      {product.isActive ? "Active" : "Hidden"}
+                    </Badge>
                   </td>
                   <td className="flex gap-3 py-2">
                     <form action={toggleProductActive}>
                       <input type="hidden" name="productId" value={product.id} />
-                      <button type="submit" className="text-xs underline">
+                      <button type="submit" className={textLinkClass()}>
                         {product.isActive ? "Hide" : "Activate"}
                       </button>
                     </form>
                     <form action={deleteVendorProduct}>
                       <input type="hidden" name="productId" value={product.id} />
-                      <button type="submit" className="text-xs text-red-600 underline">
+                      <button type="submit" className={textLinkClass("danger")}>
                         Delete
                       </button>
                     </form>

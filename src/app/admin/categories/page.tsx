@@ -14,7 +14,7 @@ export default async function AdminCategoriesPage() {
         {categories.map((category) => (
           <li
             key={category.id}
-            className="flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2 dark:border-neutral-800"
+            className="flex items-center justify-between rounded-xl border border-neutral-200 px-3 py-2 dark:border-neutral-800"
           >
             <span>{category.name}</span>
             <span className="text-neutral-500">

@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { registerUser } from "@/lib/actions/user-actions";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import Button from "@/components/ui/Button";
 
 export default function RegisterForm() {
   const [state, formAction, pending] = useActionState(
@@ -10,61 +12,43 @@ export default function RegisterForm() {
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-3">
-      <label className="flex flex-col gap-1 text-sm">
+    <form action={formAction} className="flex flex-col gap-4">
+      <label className={labelClass()}>
         Name
-        <input
-          name="name"
-          required
-          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
-        />
+        <input name="name" required className={fieldClass()} />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass()}>
         Email
-        <input
-          type="email"
-          name="email"
-          required
-          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
-        />
+        <input type="email" name="email" required className={fieldClass()} />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass()}>
         Phone number
         <input
           type="tel"
           name="phone"
           required
           placeholder="+1 555 000 0000"
-          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+          className={fieldClass()}
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass()}>
         Date of birth
-        <input
-          type="date"
-          name="dateOfBirth"
-          required
-          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
-        />
+        <input type="date" name="dateOfBirth" required className={fieldClass()} />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass()}>
         Password
         <input
           type="password"
           name="password"
           required
           minLength={8}
-          className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+          className={fieldClass()}
         />
       </label>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
-      >
+      <Button type="submit" disabled={pending} size="lg" className="mt-1 w-full">
         {pending ? "Creating account…" : "Create account"}
-      </button>
+      </Button>
     </form>
   );
 }

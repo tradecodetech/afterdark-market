@@ -4,6 +4,9 @@ import { getProductBySlug } from "@/lib/catalog";
 import { addToCart } from "@/lib/actions/cart-actions";
 import { formatCents } from "@/lib/constants";
 import { getOpenSession } from "@/lib/group-buy";
+import { fieldClass } from "@/components/ui/field";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
 import GroupBuyWidget from "./GroupBuyWidget";
 
 export default async function ProductPage({
@@ -21,7 +24,7 @@ export default async function ProductPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <div className="grid gap-10 md:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900">
+        <div className="relative aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-900">
           <Image
             src={product.imageUrl}
             alt={product.title}
@@ -33,10 +36,10 @@ export default async function ProductPage({
         </div>
 
         <div>
-          <span className="text-xs uppercase tracking-wide text-neutral-500">
+          <span className="text-xs font-medium uppercase tracking-wide text-brand-600 dark:text-brand-400">
             {product.category.name}
           </span>
-          <h1 className="mt-1 text-2xl font-semibold">{product.title}</h1>
+          <h1 className="mt-1 font-display text-2xl tracking-tight">{product.title}</h1>
           <div className="mt-3 flex items-center gap-2">
             <span className="text-xl font-semibold">
               {formatCents(product.price)}
@@ -48,14 +51,14 @@ export default async function ProductPage({
             )}
           </div>
 
-          <p className="mt-4 whitespace-pre-line text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
             {product.description}
           </p>
 
-          <div className="mt-4 rounded-lg border border-neutral-200 p-3 text-xs text-neutral-500 dark:border-neutral-800">
-            Ships from {product.vendor.name} in plain, unmarked packaging.
+          <Card className="mt-4 p-3 text-xs text-neutral-500">
+            📦 Ships from {product.vendor.name} in plain, unmarked packaging.
             Billing statement will read &ldquo;{product.vendor.discreetLabel}&rdquo;.
-          </div>
+          </Card>
 
           {product.groupBuyEnabled && product.groupBuyTarget && product.groupBuyPrice && (
             <GroupBuyWidget
@@ -76,15 +79,11 @@ export default async function ProductPage({
               defaultValue={1}
               min={1}
               max={product.stock}
-              className="w-20 rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+              className={fieldClass("w-20")}
             />
-            <button
-              type="submit"
-              disabled={product.stock === 0}
-              className="rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white disabled:opacity-40 dark:bg-white dark:text-black"
-            >
+            <Button type="submit" disabled={product.stock === 0} size="lg">
               {product.stock === 0 ? "Out of stock" : "Add to cart"}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

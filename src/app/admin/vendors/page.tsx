@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { toggleVendorApproved } from "@/lib/actions/admin-actions";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import { textLinkClass } from "@/components/ui/button";
 import NewVendorForm from "./NewVendorForm";
 
 export default async function AdminVendorsPage() {
@@ -11,12 +14,12 @@ export default async function AdminVendorsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+      <Card>
         <h2 className="text-sm font-semibold">Add vendor</h2>
         <div className="mt-3">
           <NewVendorForm />
         </div>
-      </div>
+      </Card>
 
       <div>
         <h2 className="text-sm font-semibold">Vendors ({vendors.length})</h2>
@@ -35,7 +38,7 @@ export default async function AdminVendorsPage() {
               {vendors.map((vendor) => (
                 <tr key={vendor.id}>
                   <td className="py-2 pr-2">
-                    <Link href={`/admin/vendors/${vendor.id}`} className="hover:underline">
+                    <Link href={`/admin/vendors/${vendor.id}`} className="font-medium hover:text-brand-600 dark:hover:text-brand-400">
                       {vendor.name}
                     </Link>
                   </td>
@@ -44,15 +47,17 @@ export default async function AdminVendorsPage() {
                   </td>
                   <td className="py-2 pr-2">{vendor._count.products}</td>
                   <td className="py-2 pr-2">
-                    {vendor.approved ? "Approved" : "Suspended"}
+                    <Badge tone={vendor.approved ? "success" : "danger"}>
+                      {vendor.approved ? "Approved" : "Suspended"}
+                    </Badge>
                   </td>
                   <td className="flex gap-3 py-2">
-                    <Link href={`/admin/vendors/${vendor.id}`} className="text-xs underline">
+                    <Link href={`/admin/vendors/${vendor.id}`} className={textLinkClass()}>
                       Edit
                     </Link>
                     <form action={toggleVendorApproved}>
                       <input type="hidden" name="vendorId" value={vendor.id} />
-                      <button type="submit" className="text-xs underline">
+                      <button type="submit" className={textLinkClass()}>
                         {vendor.approved ? "Suspend" : "Approve"}
                       </button>
                     </form>

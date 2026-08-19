@@ -1,5 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 import SyncButton from "./SyncButton";
 
 export default async function VendorIntegrationsPage() {
@@ -17,7 +19,7 @@ export default async function VendorIntegrationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-xl border border-neutral-200 p-5 text-sm dark:border-neutral-800">
+      <Card className="text-sm">
         <h2 className="text-sm font-semibold">API feed configuration</h2>
         <dl className="mt-3 grid grid-cols-[120px_1fr] gap-y-2 text-neutral-600 dark:text-neutral-400">
           <dt>Feed URL</dt>
@@ -33,7 +35,7 @@ export default async function VendorIntegrationsPage() {
           Contact an admin to change your feed URL, API key, or field
           mapping.
         </p>
-      </div>
+      </Card>
 
       <SyncButton />
 
@@ -46,17 +48,13 @@ export default async function VendorIntegrationsPage() {
               className="flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2 dark:border-neutral-800"
             >
               <span>{new Date(log.startedAt).toLocaleString()}</span>
-              <span
-                className={
-                  log.status === "SUCCESS"
-                    ? "text-green-600"
-                    : log.status === "ERROR"
-                      ? "text-red-600"
-                      : "text-neutral-500"
+              <Badge
+                tone={
+                  log.status === "SUCCESS" ? "success" : log.status === "ERROR" ? "danger" : "neutral"
                 }
               >
                 {log.status} — {log.itemsSynced} synced
-              </span>
+              </Badge>
             </li>
           ))}
           {logs.length === 0 && (

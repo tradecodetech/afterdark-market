@@ -17,15 +17,15 @@ export default async function ProductsPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-2xl font-semibold">Shop</h1>
+      <h1 className="font-display text-2xl tracking-tight">Shop</h1>
 
       <div className="mt-4 flex flex-wrap gap-2">
         <Link
           href="/products"
-          className={`rounded-full border px-4 py-2 text-sm ${
+          className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
             !categorySlug
-              ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-              : "border-neutral-300 dark:border-neutral-700"
+              ? "border-brand-600 bg-brand-600 text-white"
+              : "border-neutral-300 hover:border-brand-400 dark:border-neutral-700"
           }`}
         >
           All
@@ -34,10 +34,10 @@ export default async function ProductsPage({
           <Link
             key={category.id}
             href={`/products?category=${category.slug}`}
-            className={`rounded-full border px-4 py-2 text-sm ${
+            className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
               categorySlug === category.slug
-                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                : "border-neutral-300 dark:border-neutral-700"
+                ? "border-brand-600 bg-brand-600 text-white"
+                : "border-neutral-300 hover:border-brand-400 dark:border-neutral-700"
             }`}
           >
             {category.name}

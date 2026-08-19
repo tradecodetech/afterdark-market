@@ -5,9 +5,8 @@ import type { Vendor } from "@prisma/client";
 import { updateVendor } from "@/lib/actions/admin-actions";
 import { VENDOR_FEED_FIELDS } from "@/lib/vendors/types";
 import { VENDOR_INTEGRATION } from "@/lib/constants";
-
-const inputClass =
-  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import Button from "@/components/ui/Button";
 
 const FIELD_HINTS: Record<(typeof VENDOR_FEED_FIELDS)[number], string> = {
   externalId: "their unique product ID (for re-syncing the same item later)",
@@ -35,42 +34,45 @@ export default function VendorEditForm({ vendor }: { vendor: Vendor }) {
   const mapping = parseMapping(vendor.fieldMapping);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4 rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+    <form
+      action={formAction}
+      className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950"
+    >
       <input type="hidden" name="vendorId" value={vendor.id} />
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-sm">
+        <label className={labelClass()}>
           Vendor name
-          <input name="name" defaultValue={vendor.name} required className={inputClass} />
+          <input name="name" defaultValue={vendor.name} required className={fieldClass()} />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className={labelClass()}>
           Contact email
           <input
             name="contactEmail"
             type="email"
             defaultValue={vendor.contactEmail}
             required
-            className={inputClass}
+            className={fieldClass()}
           />
         </label>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass()}>
         Discreet billing label
         <input
           name="discreetLabel"
           defaultValue={vendor.discreetLabel}
-          className={inputClass}
+          className={fieldClass()}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass()}>
         Integration type
         <select
           name="integrationType"
-          value={integrationType}
+          defaultValue={vendor.integrationType}
           onChange={(e) => setIntegrationType(e.target.value)}
-          className={inputClass}
+          className={fieldClass()}
         >
           <option value={VENDOR_INTEGRATION.MANUAL}>Manual entry</option>
           <option value={VENDOR_INTEGRATION.API}>API feed</option>
@@ -80,22 +82,22 @@ export default function VendorEditForm({ vendor }: { vendor: Vendor }) {
       {integrationType === VENDOR_INTEGRATION.API && (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-1 text-sm">
+            <label className={labelClass()}>
               Feed URL
               <input
                 name="apiBaseUrl"
                 defaultValue={vendor.apiBaseUrl ?? ""}
                 placeholder="https://vendor.example.com/api/products"
-                className={inputClass}
+                className={fieldClass()}
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
+            <label className={labelClass()}>
               API key (sent as Bearer token)
               <input
                 name="apiKey"
                 defaultValue={vendor.apiKey ?? ""}
                 placeholder="optional"
-                className={inputClass}
+                className={fieldClass()}
               />
             </label>
           </div>
@@ -114,7 +116,7 @@ export default function VendorEditForm({ vendor }: { vendor: Vendor }) {
                     name={`map_${field}`}
                     defaultValue={mapping[field] ?? ""}
                     placeholder={field}
-                    className={inputClass}
+                    className={fieldClass()}
                   />
                   <span className="text-neutral-500">{FIELD_HINTS[field]}</span>
                 </label>
@@ -127,13 +129,9 @@ export default function VendorEditForm({ vendor }: { vendor: Vendor }) {
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && <p className="text-sm text-green-600">{state.success}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
-      >
+      <Button type="submit" disabled={pending} className="self-start">
         {pending ? "Saving…" : "Save"}
-      </button>
+      </Button>
     </form>
   );
 }

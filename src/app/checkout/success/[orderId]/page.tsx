@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/constants";
+import ButtonLink from "@/components/ui/ButtonLink";
 
 export default async function CheckoutSuccessPage({
   params,
@@ -19,8 +19,11 @@ export default async function CheckoutSuccessPage({
   if (!order || order.userId !== session.user.id) notFound();
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-16 text-center">
-      <h1 className="text-2xl font-semibold">Order confirmed</h1>
+    <div className="mx-auto max-w-xl px-4 py-20 text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-2xl dark:bg-brand-900/40">
+        ✓
+      </div>
+      <h1 className="mt-5 font-display text-2xl tracking-tight">Order confirmed</h1>
       <p className="mt-2 text-sm text-neutral-500">
         Order #{order.id.slice(-8).toUpperCase()} — total{" "}
         {formatCents(order.total)}
@@ -29,12 +32,9 @@ export default async function CheckoutSuccessPage({
         It will ship in plain packaging. Your billing statement will read
         &ldquo;{order.billingDescriptor}&rdquo;.
       </p>
-      <Link
-        href="/account"
-        className="mt-8 inline-block rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-black"
-      >
+      <ButtonLink href="/account" size="lg" className="mt-8">
         View your orders
-      </Link>
+      </ButtonLink>
     </div>
   );
 }

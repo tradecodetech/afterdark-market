@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { verifyPhoneCode } from "@/lib/actions/phone-actions";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import Button from "@/components/ui/Button";
 
 export default function VerifyCodeForm() {
   const [state, formAction, pending] = useActionState(
@@ -10,8 +12,8 @@ export default function VerifyCodeForm() {
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-2">
-      <label className="flex flex-col gap-1 text-sm">
+    <form action={formAction} className="flex flex-col gap-3">
+      <label className={labelClass()}>
         6-digit code
         <input
           name="code"
@@ -19,16 +21,12 @@ export default function VerifyCodeForm() {
           pattern="[0-9]{6}"
           maxLength={6}
           required
-          className="rounded-md border border-neutral-300 px-3 py-2 tracking-widest dark:border-neutral-700 dark:bg-neutral-900"
+          className={fieldClass("tracking-widest")}
         />
       </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
-      >
+      <Button type="submit" disabled={pending} className="self-start">
         {pending ? "Verifying…" : "Verify"}
-      </button>
+      </Button>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
     </form>
   );

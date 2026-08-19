@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #18181b;
 }
 
 @theme inline {
@@ -10,10 +10,31 @@
   --color-foreground: var(--foreground);
 }
 
+/* Brand palette — violet primary, rose accent. Fixed across light/dark so
+   the brand reads consistently; only background/foreground swap. */
+@theme {
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-900: #3b0764;
+
+  --color-accent-100: #ffe4e6;
+  --color-accent-400: #fb7185;
+  --color-accent-500: #f43f5e;
+  --color-accent-600: #e11d48;
+
+  --font-display: "Georgia", "Iowan Old Style", serif;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0b0a10;
+    --foreground: #f4f2fa;
   }
 }
 
@@ -28,4 +49,9 @@ body {
     Helvetica,
     Arial,
     sans-serif;
+}
+
+::selection {
+  background: var(--color-brand-300);
+  color: var(--color-brand-900);
 }
