@@ -12,7 +12,7 @@ field in `package.json`) if it ever needs to change again.
 ## Stack
 
 - **Next.js 16** (App Router, Server Actions, TypeScript)
-- **Prisma** + **SQLite** for local dev (see [Switching to Postgres](#switching-to-postgres))
+- **Prisma** + **Postgres** (see [Database & deploying to Vercel](#database--deploying-to-vercel))
 - **Auth.js (NextAuth v5)**, credentials-based, with `CUSTOMER` / `VENDOR` / `ADMIN` roles
 - **Tailwind CSS**
 - A pluggable **payment provider** interface (mock processor included — see [Payments](#payments))
@@ -20,18 +20,24 @@ field in `package.json`) if it ever needs to change again.
 
 ## Getting started
 
+Needs a Postgres database — a free one from [Neon](https://neon.tech) or
+[Vercel Postgres](https://vercel.com/storage/postgres) takes under a
+minute to create. Put its connection string in `DATABASE_URL`.
+
 ```bash
 npm install                # also creates .env and generates AUTH_SECRET (postinstall)
-npx prisma migrate dev     # creates prisma/dev.db and applies the schema
+# edit .env: paste your Postgres connection string into DATABASE_URL
+npx prisma migrate dev --name init   # creates prisma/migrations/ and applies the schema
 npm run db:seed            # demo categories, vendors, products, and accounts
 npm run dev
 ```
 
 `AUTH_SECRET` generation (`scripts/setup-env.mjs`) runs automatically as
-part of `npm install` — nothing to copy-paste. It's idempotent and only
-fills in a value if one is missing or empty, so it's safe on every
-install, including after pulling an update. Re-run it by hand anytime
-with `npm run setup`.
+part of `npm install` — nothing to copy-paste for that one. It's
+idempotent and only fills in a value if one is missing or empty, so it's
+safe on every install, including after pulling an update. Re-run it by
+hand anytime with `npm run setup`. `DATABASE_URL` still needs a real
+value from you — it can't be auto-generated.
 
 Open http://localhost:3000. You'll hit the 18+ age gate first (any
 visitor, cookie-based, independent of login).
@@ -98,13 +104,26 @@ Two integration types per vendor (`Vendor.integrationType`):
   header: `title,description,price,stock,sku,imageUrl,categorySlug`
   (price in dollars, e.g. `24.99`).
 
-## Switching to Postgres
+## Database & deploying to Vercel
 
-Local dev uses SQLite (zero external services). For production:
+1. **Create a Postgres database.** In the Vercel dashboard: your project → **Storage** → **Create Database** → Postgres (this provisions a free Neon-backed database and can auto-link its `DATABASE_URL` to your project). Or create one directly at [neon.tech](https://neon.tech) and add `DATABASE_URL` to the project's Environment Variables yourself.
+2. **Import the repo.** Vercel dashboard → **Add New** → **Project** → pick this GitHub repo. Vercel auto-detects Next.js.
+3. **Set environment variables** (Project → Settings → Environment Variables), same names as `.env.example`:
+   - `DATABASE_URL` — from step 1 (skip if the Storage integration already linked it)
+   - `AUTH_SECRET` — generate with `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` and paste the output
+   - `NEXT_PUBLIC_SITE_NAME` — `Pikaboo`
+   - `PAYMENT_PROVIDER` — `mock`
+   - `APP_URL` — your Vercel deployment URL (e.g. `https://pikaboo.vercel.app`) once you know it; it's only used by the seed script
+4. **Deploy.** Vercel runs the `vercel-build` script automatically (`prisma generate && prisma migrate deploy && next build`), which applies the schema to your new database on every deploy — no separate migration step needed once `prisma/migrations/` has a baseline (see step 5).
+5. **First-time only — create the baseline migration and seed data.** `prisma migrate deploy` only *applies* existing migrations; it doesn't generate them. Locally, with `DATABASE_URL` in your `.env` pointed at the **same** Postgres database Vercel is using:
+   ```bash
+   npx prisma migrate dev --name init
+   npm run db:seed
+   git add prisma/migrations && git commit -m "Add baseline Postgres migration" && git push
+   ```
+   That push triggers a new Vercel deploy, which now has a migration to apply.
 
-1. In `prisma/schema.prisma`, change `datasource db { provider = "sqlite" }` to `provider = "postgresql"`.
-2. Set `DATABASE_URL` to a Postgres connection string in `.env`.
-3. Run `npx prisma migrate dev` to regenerate migrations against Postgres.
+After that, your Vercel deployment URL is the client-shareable link.
 
 ## Compliance notes
 

@@ -1,18 +1,18 @@
 // Prisma schema for Pikaboo.
 //
-// NOTE ON PROVIDER: this project ships against SQLite so it runs anywhere
-// with zero external services. SQLite does not support native enums, so
-// role/status fields are plain strings constrained in code (see
-// src/lib/constants.ts). To move to Postgres for production: change
-// `provider` below to "postgresql", set DATABASE_URL to a Postgres
-// connection string, and re-run `npx prisma migrate dev`. See README.
+// NOTE ON PROVIDER: this runs against Postgres (originally prototyped on
+// SQLite — role/status fields are still plain strings, not native enums,
+// for that reason; see src/lib/constants.ts). For pure local scratch work
+// with zero external services, you can point DATABASE_URL at a local
+// SQLite file and switch `provider` back to "sqlite" temporarily, but the
+// deployed app and the checked-in migrations target Postgres.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -55,7 +55,7 @@ model PhoneVerificationCode {
 model Address {
   id        String  @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   label     String  @default("Home")
   line1     String
   line2     String?
@@ -107,32 +107,33 @@ model Category {
 }
 
 model Product {
-  id                String   @id @default(cuid())
-  vendorId          String
-  vendor            Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  categoryId        String
-  category          Category @relation(fields: [categoryId], references: [id])
-  title             String
-  slug              String   @unique
-  description       String
-  price             Int
-  compareAtPrice    Int?
-  sku               String
-  stock             Int      @default(0)
-  imageUrl          String
-  discreetPackaging Boolean  @default(true)
-  isActive          Boolean  @default(true)
-  source            String   @default("MANUAL")
-  externalId        String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  groupBuyEnabled     Boolean @default(false)
+  id                  String            @id @default(cuid())
+  vendorId            String
+  vendor              Vendor            @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  categoryId          String
+  category            Category          @relation(fields: [categoryId], references: [id])
+  title               String
+  slug                String            @unique
+  description         String
+  price               Int
+  compareAtPrice      Int?
+  sku                 String
+  stock               Int               @default(0)
+  imageUrl            String
+  discreetPackaging   Boolean           @default(true)
+  isActive            Boolean           @default(true)
+  source              String            @default("MANUAL")
+  externalId          String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  groupBuyEnabled     Boolean           @default(false)
   groupBuyTarget      Int?
   groupBuyPrice       Int?
-  groupBuyWindowHours Int     @default(48)
-  cartItems        CartItem[]
-  orderItems       OrderItem[]
-  groupBuySessions GroupBuySession[]
+  groupBuyWindowHours Int               @default(48)
+  cartItems           CartItem[]
+  orderItems          OrderItem[]
+  groupBuySessions    GroupBuySession[]
+
   @@index([vendorId, externalId])
 }
 
@@ -144,14 +145,15 @@ model Cart {
 }
 
 model CartItem {
-  id        String  @id @default(cuid())
-  cartId    String
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  quantity  Int     @default(1)
+  id                String  @id @default(cuid())
+  cartId            String
+  cart              Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity          Int     @default(1)
   unitPriceOverride Int?
   groupBuySessionId String?
+
   @@unique([cartId, productId])
 }
 
@@ -169,14 +171,14 @@ model Reward {
 }
 
 model GroupBuySession {
-  id          String    @id @default(cuid())
-  productId   String
-  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  targetCount Int
-  status      String    @default("OPEN")
-  expiresAt   DateTime
-  createdAt   DateTime  @default(now())
-  completedAt DateTime?
+  id           String                @id @default(cuid())
+  productId    String
+  product      Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  targetCount  Int
+  status       String                @default("OPEN")
+  expiresAt    DateTime
+  createdAt    DateTime              @default(now())
+  completedAt  DateTime?
   participants GroupBuyParticipant[]
 }
 
@@ -187,16 +189,17 @@ model GroupBuyParticipant {
   userId    String
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   joinedAt  DateTime        @default(now())
+
   @@unique([sessionId, userId])
 }
 
 model Order {
-  id                String   @id @default(cuid())
+  id                String      @id @default(cuid())
   userId            String
-  user              User     @relation(fields: [userId], references: [id])
-  status            String   @default("PENDING")
+  user              User        @relation(fields: [userId], references: [id])
+  status            String      @default("PENDING")
   subtotal          Int
-  discountTotal     Int      @default(0)
+  discountTotal     Int         @default(0)
   appliedRewardId   String?
   shippingTotal     Int
   total             Int
@@ -205,11 +208,11 @@ model Order {
   shippingCity      String
   shippingState     String
   shippingPostal    String
-  shippingCountry   String   @default("US")
+  shippingCountry   String      @default("US")
   billingDescriptor String
-  createdAt         DateTime @default(now())
-  items    OrderItem[]
-  payments Payment[]
+  createdAt         DateTime    @default(now())
+  items             OrderItem[]
+  payments          Payment[]
 }
 
 model OrderItem {
@@ -263,38 +266,38 @@ model CreatorProfile {
 }
 
 model ContactRequest {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   requesterId      String
   creatorId        String
   creatorProfileId String
-  fee              Int      @default(0)
-  status           String   @default("PENDING")
+  fee              Int       @default(0)
+  status           String    @default("PENDING")
   paymentRef       String?
   expiresAt        DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([creatorId, status])
   @@index([requesterId, status])
 }
 
 model VideoSession {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   contactRequestId  String?
   customerId        String
   creatorId         String
   creatorProfileId  String
-  status            String   @default("SCHEDULED")
-  rate              Int      @default(0)
-  platformFee       Int      @default(0)
-  creatorAmount     Int      @default(0)
+  status            String    @default("SCHEDULED")
+  rate              Int       @default(0)
+  platformFee       Int       @default(0)
+  creatorAmount     Int       @default(0)
   provider          String?
   providerSessionId String?
   scheduledAt       DateTime?
   startedAt         DateTime?
   endedAt           DateTime?
   durationSeconds   Int?
-  createdAt         DateTime @default(now())
+  createdAt         DateTime  @default(now())
 
   @@index([creatorId, status])
   @@index([customerId, status])
@@ -317,18 +320,18 @@ model Gift {
 }
 
 model CreatorEarning {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   creatorId        String
   creatorProfileId String
   videoSessionId   String?
   giftId           String?
   grossAmount      Int
-  platformFee      Int      @default(0)
+  platformFee      Int       @default(0)
   netAmount        Int
-  status           String   @default("PENDING")
+  status           String    @default("PENDING")
   availableAt      DateTime?
   paidAt           DateTime?
-  createdAt        DateTime @default(now())
+  createdAt        DateTime  @default(now())
 
   @@index([creatorId, status])
 }
