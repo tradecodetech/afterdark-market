@@ -1,4 +1,4 @@
-export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Pikaboo";
+export const SITE_NAME = "Pikaboo";
 export const MINIMUM_AGE = 18;
 export const AGE_GATE_COOKIE = "pkb_age_ok";
 export const AUTH_COOKIE_MAX_AGE_DAYS = 30;
