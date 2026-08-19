@@ -7,8 +7,17 @@ import AgeGate from "@/components/AgeGate";
 import { AGE_GATE_COOKIE, SITE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: SITE_NAME,
-  description: `${SITE_NAME} — adult products, discreetly delivered.`,
+  title: {
+    default: `${SITE_NAME} — Shop & Connect`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: `${SITE_NAME} — a discreet adult marketplace and creator community.`,
+  applicationName: SITE_NAME,
+  icons: {
+    icon: "/pikaboo-icon.svg",
+    shortcut: "/pikaboo-icon.svg",
+    apple: "/pikaboo-icon.svg",
+  },
 };
 
 export default async function RootLayout({

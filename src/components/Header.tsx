@@ -18,8 +18,12 @@ export default async function Header() {
 
   const navLinks = [
     { href: "/products", label: "Shop" },
+    { href: "/community", label: "Community" },
     { href: "/feed", label: "Feed" },
     { href: "/spin", label: "Spin & Win" },
+    ...(session?.user?.role === ROLES.CREATOR
+      ? [{ href: "/creator", label: "Creator Dashboard" }]
+      : []),
     ...(session?.user?.role === ROLES.VENDOR
       ? [{ href: "/vendor", label: "Vendor Dashboard" }]
       : []),

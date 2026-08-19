@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #18181b;
+  --background: #faf8fb;
+  --foreground: #17131a;
+  --pink: #ff5c8a;
+  --violet: #8b5cf6;
 }
 
 @theme inline {
@@ -33,13 +35,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b0a10;
-    --foreground: #f4f2fa;
+    --background: #09080d;
+    --foreground: #f4eef7;
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255, 92, 138, 0.08), transparent 28rem),
+    radial-gradient(circle at 92% 10%, rgba(139, 92, 246, 0.08), transparent 30rem),
+    var(--background);
   color: var(--foreground);
   font-family:
     system-ui,
@@ -54,4 +63,34 @@ body {
 ::selection {
   background: var(--color-brand-300);
   color: var(--color-brand-900);
+}
+
+.pikaboo-gradient {
+  background: linear-gradient(135deg, var(--pink), var(--violet));
+}
+
+.pikaboo-text-gradient {
+  background: linear-gradient(135deg, var(--pink), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pikaboo-glow {
+  box-shadow: 0 20px 80px rgba(139, 92, 246, 0.12);
+}
+
+.pikaboo-card {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.pikaboo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 45px rgba(20, 10, 30, 0.09);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pikaboo-card:hover {
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  }
 }
