@@ -4,7 +4,7 @@ import { formatCents } from "@/lib/constants";
 import { toggleProductActive, deleteVendorProduct } from "@/lib/actions/vendor-actions";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { textLinkClass } from "@/components/ui/button";
+import { textLinkClass } from "@/components/ui/button-styles";
 import NewProductForm from "./NewProductForm";
 import CsvImportForm from "./CsvImportForm";
 

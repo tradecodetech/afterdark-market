@@ -1,6 +1,6 @@
 import Link, { type LinkProps } from "next/link";
 import type { AnchorHTMLAttributes } from "react";
-import { buttonClass, type ButtonSize, type ButtonVariant } from "./button";
+import { buttonClass, type ButtonSize, type ButtonVariant } from "./button-styles";
 
 type Props = LinkProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> & {

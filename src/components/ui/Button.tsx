@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
-import { buttonClass, type ButtonSize, type ButtonVariant } from "./button";
+import { buttonClass, type ButtonSize, type ButtonVariant } from "./button-styles";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;

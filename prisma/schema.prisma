@@ -259,10 +259,85 @@ model CreatorProfile {
   isApproved       Boolean  @default(false)
   identityVerified Boolean  @default(false)
   ageVerified      Boolean  @default(false)
+  membershipPrice Int      @default(500)
+  posts CreatorPost[]
+  memberships CreatorMembership[]
+  messages CommunityMessage[]
+  streams CommunityStream[]
+  tips CommunityTip[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   @@index([isApproved, isAvailable])
+}
+
+model CreatorPost {
+  id String @id @default(cuid())
+  creatorId String
+  creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  title String
+  body String
+  membersOnly Boolean @default(false)
+  status String @default("PENDING")
+  createdAt DateTime @default(now())
+  @@index([creatorId, status, createdAt])
+}
+
+model CreatorMembership {
+  id String @id @default(cuid())
+  creatorId String
+  creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  userId String
+  expiresAt DateTime
+  cancelled Boolean @default(false)
+  isDemo Boolean @default(true)
+  amount Int
+  @@unique([creatorId, userId])
+}
+
+model CommunityMessage {
+  id String @id @default(cuid())
+  creatorId String
+  creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  userId String
+  authorName String
+  body String
+  hidden Boolean @default(false)
+  createdAt DateTime @default(now())
+  @@index([creatorId, createdAt])
+}
+
+model CommunityReport {
+  id String @id @default(cuid())
+  reporterId String
+  targetId String
+  targetType String
+  reason String
+  resolved Boolean @default(false)
+  createdAt DateTime @default(now())
+  @@unique([reporterId, targetId, targetType])
+  @@index([resolved, createdAt])
+}
+
+model CommunityStream {
+  id String @id @default(cuid())
+  creatorId String
+  creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  title String
+  scheduledAt DateTime
+  status String @default("SCHEDULED")
+  @@index([creatorId, scheduledAt])
+}
+
+model CommunityTip {
+  id String @id
+  creatorId String
+  creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  userId String
+  amount Int
+  isDemo Boolean @default(true)
+  createdAt DateTime @default(now())
+  @@index([creatorId, createdAt])
 }
 
 model ContactRequest {

@@ -4,19 +4,19 @@ import { auth } from "@/lib/auth";
 const steps = [
   {
     title: "Browse creators",
-    text: "Discover approved adult creators, review their profiles, availability, and connection pricing.",
+    text: "Discover approved creators and explore their creative work, profiles, and communities.",
   },
   {
-    title: "Request contact",
-    text: "A customer can submit a paid connection request. The creator accepts or declines before a private session is created.",
+    title: "Join a membership",
+    text: "Unlock member-only posts and community chat. Try a 30-day demo membership without a charge or automatic renewal.",
   },
   {
-    title: "Book a private session",
-    text: "Accepted requests can lead to a scheduled 1:1 session. Video transport and payment-provider integrations will plug into this state model.",
+    title: "Meet your community",
+    text: "Join the conversation and discover upcoming live sessions. Broadcasting will be available when a video provider is connected.",
   },
   {
-    title: "Send gifts",
-    text: "Customers can send creator gifts during eligible interactions. Earnings are tracked separately from marketplace orders.",
+    title: "Support creators",
+    text: "Try demo tips, share feedback, and help keep the community welcoming by reporting inappropriate content.",
   },
 ];
 
@@ -30,10 +30,10 @@ export default async function CommunityPage() {
       <section className="rounded-3xl border border-neutral-200 bg-neutral-50 p-8 dark:border-neutral-800 dark:bg-neutral-950 sm:p-12">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-500">Pikaboo Community</p>
         <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-          Connect with creators. Request private time. Send gifts.
+          Find your creators. Join their world.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-600 dark:text-neutral-400">
-          Discover approved creators, send paid connection requests, and continue into scheduled private sessions when accepted.
+          Creative work, member-only updates, and conversations that bring people together. A community for non-explicit content.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href={communityHref} className="rounded-full bg-black px-5 py-3 text-sm font-medium text-white hover:opacity-80 dark:bg-white dark:text-black">
@@ -56,7 +56,7 @@ export default async function CommunityPage() {
       </section>
 
       <section className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm leading-6 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
-        <strong>Community foundation:</strong> creator profiles, contact requests, session records, gifts, and creator earnings now have dedicated database models. Real payment processing, identity/age verification, moderation, payouts, and the video provider remain explicit integration steps before this becomes a live service.
+        <strong>Demo community:</strong> memberships and tips are simulated. No money is charged or paid out. Live broadcasting is not connected. Posts are reviewed before publication, and members can report posts and chat messages.
       </section>
     </main>
   );

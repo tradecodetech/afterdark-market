@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { toggleVendorApproved } from "@/lib/actions/admin-actions";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { textLinkClass } from "@/components/ui/button";
+import { textLinkClass } from "@/components/ui/button-styles";
 import NewVendorForm from "./NewVendorForm";
 
 export default async function AdminVendorsPage() {

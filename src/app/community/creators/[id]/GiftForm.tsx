@@ -20,7 +20,7 @@ export function GiftForm({ creatorProfileId, videoSessionId }: { creatorProfileI
       </div>
       <input name="label" placeholder="Gift message (optional)" maxLength={60} className="w-full rounded-xl border border-neutral-300 bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700" />
       <input name="cardNumber" inputMode="numeric" autoComplete="off" placeholder="Demo card number" className="w-full rounded-xl border border-neutral-300 bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700" required />
-      <p className="text-xs text-neutral-500">Uses Pikaboo's mock payment provider. No real card is charged.</p>
+      <p className="text-xs text-neutral-500">Uses Pikaboo’s mock payment provider. No real card is charged.</p>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && <p className="text-sm text-green-700">{state.success}</p>}
       <button type="submit" disabled={pending} className="rounded-xl bg-black px-5 py-3 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black">

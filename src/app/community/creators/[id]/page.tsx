@@ -36,6 +36,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ id: st
         </div>
 
         <div className="mt-8 border-t border-neutral-200 pt-8 dark:border-neutral-800">
+          <Link href={`/community/creators/${creator.id}/hub`} className="mb-6 inline-block rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white">Explore posts, membership & community chat →</Link>
           <h2 className="text-xl font-semibold">Request contact</h2>
           <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
             The request fee is charged before the creator decides whether to accept. An accepted request can later be used to schedule an eligible private session.

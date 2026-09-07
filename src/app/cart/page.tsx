@@ -9,7 +9,7 @@ import {
 } from "@/lib/actions/cart-actions";
 import { formatCents } from "@/lib/constants";
 import { fieldClass } from "@/components/ui/field";
-import { textLinkClass } from "@/components/ui/button";
+import { textLinkClass } from "@/components/ui/button-styles";
 import Badge from "@/components/ui/Badge";
 import ButtonLink from "@/components/ui/ButtonLink";
 

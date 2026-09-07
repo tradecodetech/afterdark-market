@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/constants";
 import { adminToggleProductActive } from "@/lib/actions/admin-actions";
 import Badge from "@/components/ui/Badge";
-import { textLinkClass } from "@/components/ui/button";
+import { textLinkClass } from "@/components/ui/button-styles";
 
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
