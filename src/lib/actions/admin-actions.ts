@@ -15,9 +15,99 @@ async function requireAdmin() {
   if (!session?.user || session.user.role !== ROLES.ADMIN) {
     redirect("/");
   }
+  return session.user;
 }
 
 export type ActionState = { error?: string; success?: string } | undefined;
+
+export async function createAdminUser(formData: FormData) {
+  await requireAdmin();
+
+  const name = String(formData.get("name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const role = String(formData.get("role") ?? ROLES.CUSTOMER);
+  const ageVerified = formData.get("ageVerified") === "on";
+
+  if (!name || !email || password.length < 8) {
+    redirect("/admin/users?error=Name%2C+email%2C+and+a+password+of+at+least+8+characters+are+required.");
+  }
+  if (![ROLES.CUSTOMER, ROLES.CREATOR, ROLES.ADMIN].includes(role as typeof ROLES.CUSTOMER)) {
+    redirect("/admin/users?error=Invalid+user+role.");
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) redirect("/admin/users?error=That+email+is+already+in+use.");
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      passwordHash,
+      role,
+      dateOfBirth: new Date("1990-01-01"),
+      ageVerified,
+      phoneVerified: true,
+    },
+  });
+
+  if (role === ROLES.CREATOR) {
+    const contactFee = Math.max(0, Math.round(Number(formData.get("contactFee") ?? 10) * 100));
+    const sessionRate = Math.max(0, Math.round(Number(formData.get("sessionRate") ?? 50) * 100));
+    await prisma.creatorProfile.create({
+      data: {
+        userId: user.id,
+        displayName: name,
+        bio: "Creator profile created by Pikaboo admin.",
+        contactFee,
+        sessionRate,
+        isAvailable: true,
+        isApproved: true,
+        identityVerified: ageVerified,
+        ageVerified,
+      },
+    });
+  }
+
+  revalidatePath("/admin/users");
+  revalidatePath("/community/creators");
+  redirect("/admin/users?success=User+created.");
+}
+
+export async function deleteAdminUser(formData: FormData) {
+  const admin = await requireAdmin();
+  const userId = String(formData.get("userId") ?? "");
+  if (!userId) redirect("/admin/users?error=Missing+user+ID.");
+  if (userId === admin.id) redirect("/admin/users?error=You+cannot+delete+your+own+admin+account.");
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { _count: { select: { orders: true } } },
+  });
+  if (!user) redirect("/admin/users?error=User+not+found.");
+  if (user._count.orders > 0) {
+    redirect("/admin/users?error=This+user+has+existing+orders+and+cannot+be+deleted.+Disable+or+anonymize+them+instead.");
+  }
+
+  if (user.role === ROLES.ADMIN) {
+    const adminCount = await prisma.user.count({ where: { role: ROLES.ADMIN } });
+    if (adminCount <= 1) redirect("/admin/users?error=The+last+admin+account+cannot+be+deleted.");
+  }
+
+  await prisma.$transaction([
+    prisma.creatorEarning.deleteMany({ where: { creatorId: userId } }),
+    prisma.gift.deleteMany({ where: { OR: [{ senderId: userId }, { recipientId: userId }] } }),
+    prisma.videoSession.deleteMany({ where: { OR: [{ customerId: userId }, { creatorId: userId }] } }),
+    prisma.contactRequest.deleteMany({ where: { OR: [{ requesterId: userId }, { creatorId: userId }] } }),
+    prisma.creatorProfile.deleteMany({ where: { userId } }),
+    prisma.user.delete({ where: { id: userId } }),
+  ]);
+
+  revalidatePath("/admin/users");
+  revalidatePath("/community/creators");
+  redirect("/admin/users?success=User+removed.");
+}
 
 export async function createVendor(
   _prevState: ActionState,
