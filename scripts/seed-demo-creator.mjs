@@ -33,8 +33,10 @@ async function main() {
     where: { userId: user.id },
     update: {
       displayName: "Avery",
-      bio: "Demo creator profile for testing the Pikaboo community flow.",
-      avatarUrl: null,
+      bio: "Good vibes, real moments, and exclusive creator updates. Welcome to my Pikaboo.",
+      avatarUrl: "/demo/avery-avatar.svg",
+      bannerUrl: "/demo/avery-banner.svg",
+      membershipPrice: 500,
       contactFee: 1000,
       sessionRate: 5000,
       isAvailable: true,
@@ -45,7 +47,10 @@ async function main() {
     create: {
       userId: user.id,
       displayName: "Avery",
-      bio: "Demo creator profile for testing the Pikaboo community flow.",
+      bio: "Good vibes, real moments, and exclusive creator updates. Welcome to my Pikaboo.",
+      avatarUrl: "/demo/avery-avatar.svg",
+      bannerUrl: "/demo/avery-banner.svg",
+      membershipPrice: 500,
       contactFee: 1000,
       sessionRate: 5000,
       isAvailable: true,
@@ -54,6 +59,14 @@ async function main() {
       ageVerified: true,
     },
   });
+
+  await prisma.creatorPost.deleteMany({ where: { creatorId: profile.id, title: { in: ["Welcome to my Pikaboo", "Members update"] } } });
+  await prisma.creatorPost.createMany({ data: [
+    { creatorId: profile.id, title: "Welcome to my Pikaboo", body: "Thanks for all the love and support. Here is a new creator update to start the week.", mediaUrl: "/demo/avery-welcome.svg", membersOnly: false, status: "PUBLISHED" },
+    { creatorId: profile.id, title: "Members update", body: "Members get extra posts, community chat, and early access to upcoming creator drops.", mediaUrl: "/demo/avery-welcome.svg", membersOnly: true, status: "PUBLISHED" },
+  ] });
+  await prisma.communityStream.deleteMany({ where: { creatorId: profile.id, title: "Chill & Chat" } });
+  await prisma.communityStream.create({ data: { creatorId: profile.id, title: "Chill & Chat", scheduledAt: new Date(Date.now() + 7 * 86400000), status: "SCHEDULED" } });
 
   console.log("Demo creator ready.");
   console.log(`Login: ${email} / ${password}`);
