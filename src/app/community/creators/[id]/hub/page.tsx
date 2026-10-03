@@ -72,7 +72,8 @@ export default async function CreatorHub({ params }: { params: Promise<{ id: str
   return (
     <main className="min-h-screen bg-[#0d0e13] text-white">
       <div className="relative h-52 overflow-hidden border-b border-white/10 bg-gradient-to-r from-[#35104f] via-[#7c2bbd] to-[#ec4899] sm:h-72">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,.18),transparent_35%)]" />
+        {creator.bannerUrl && <img src={creator.bannerUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
         <div className="absolute bottom-5 left-5 text-xs font-semibold uppercase tracking-[.25em] text-white/70 sm:left-[max(2rem,calc((100%-1180px)/2))]">Pikaboo creator</div>
       </div>
 
@@ -127,6 +128,7 @@ export default async function CreatorHub({ params }: { params: Promise<{ id: str
                   </div>
                   <h2 className="mt-5 text-xl font-semibold">{post.title}</h2>
                   <p className="mt-3 whitespace-pre-wrap break-words leading-7 text-neutral-200">{post.body}</p>
+                  {post.mediaUrl && <img src={post.mediaUrl} alt="" className="mt-5 max-h-[560px] w-full rounded-xl object-cover" />}
                   <div className="mt-5 flex gap-6 border-t border-white/10 pt-4 text-sm text-neutral-400">
                     <span>♡ Like</span><span>◯ Comment</span><span>↗ Share</span>
                   </div>
