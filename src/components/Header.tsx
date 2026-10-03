@@ -31,10 +31,10 @@ export default async function Header() {
   ];
 
   const linkClass =
-    "text-sm font-medium text-neutral-600 transition hover:text-brand-600 dark:text-neutral-400 dark:hover:text-brand-400";
+    "text-sm font-medium text-white/85 transition hover:text-white";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200/80 bg-white/85 backdrop-blur-md dark:border-neutral-800/80 dark:bg-neutral-950/85">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/75 text-white shadow-lg shadow-black/10 backdrop-blur-xl">
       {session?.user && !phoneVerified && (
         <div className="bg-amber-50 px-4 py-2 text-center text-xs font-medium text-amber-900 dark:bg-amber-950/60 dark:text-amber-200">
           <Link href="/auth/verify-phone" className="underline underline-offset-2">
@@ -49,7 +49,7 @@ export default async function Header() {
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-sm">
             👀
           </span>
-          <span className="font-display text-lg tracking-tight">{SITE_NAME}</span>
+          <span className="font-display text-lg tracking-tight text-white">{SITE_NAME}</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -97,7 +97,7 @@ export default async function Header() {
 
         {/* Mobile: cart + CSS-only hamburger toggle, no client JS needed */}
         <div className="flex items-center gap-3 md:hidden">
-          <Link href="/cart" className="relative text-sm font-medium">
+          <Link href="/cart" className="relative text-sm font-medium text-white">
             Cart
             {cartCount > 0 && (
               <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-xs font-semibold text-white">
@@ -107,7 +107,7 @@ export default async function Header() {
           </Link>
           <label
             htmlFor="mobile-nav-toggle"
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-neutral-300 dark:border-neutral-700"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/25 text-white"
             aria-label="Open menu"
           >
             ☰
@@ -116,7 +116,7 @@ export default async function Header() {
       </div>
 
       <input type="checkbox" id="mobile-nav-toggle" className="peer hidden" />
-      <nav className="hidden flex-col gap-1 border-t border-neutral-200 px-4 py-3 peer-checked:flex dark:border-neutral-800 md:hidden">
+      <nav className="hidden flex-col gap-1 border-t border-white/10 bg-black/90 px-4 py-3 text-white peer-checked:flex md:hidden">
         {navLinks.map((link) => (
           <Link key={link.href} href={link.href} className="rounded-lg px-2 py-2.5 text-sm font-medium">
             {link.label}
