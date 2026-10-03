@@ -277,6 +277,7 @@ model CreatorPost {
   creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   title String
   body String
+  mediaUrl String?
   membersOnly Boolean @default(false)
   status String @default("PENDING")
   createdAt DateTime @default(now())
