@@ -253,6 +253,7 @@ model CreatorProfile {
   displayName      String
   bio              String?
   avatarUrl        String?
+  bannerUrl        String?
   contactFee       Int      @default(0)
   sessionRate      Int      @default(0)
   isAvailable      Boolean  @default(false)
