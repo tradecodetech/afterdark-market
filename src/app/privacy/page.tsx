@@ -108,10 +108,7 @@ export default function PrivacyPage() {
       </div>
 
       <p className="mt-6 text-sm leading-relaxed text-neutral-500">
-        This draft describes how Pikaboo handles information
-        associated with its adult marketplace and creator
-        community. The legal operating entity and final
-        effective date must be confirmed before publication.
+        "This draft describes how Pikaboo, operated by Velvet Vault, handles information associated with its adult marketplace and creator community. The final effective date and operating procedures must be confirmed before publication.",
       </p>
 
       <div className="mt-10 space-y-9">
