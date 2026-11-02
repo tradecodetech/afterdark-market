@@ -1,54 +1,54 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { startOfToday } from "@/lib/rewards";
-import { getActiveRewards } from "@/lib/actions/reward-actions";
-import Card from "@/components/ui/Card";
-import SpinWheel from "./SpinWheel";
 
-export default async function SpinPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/auth/login?callbackUrl=/spin");
+import Link from "next/link";
 
-  const [alreadySpun, activeRewards] = await Promise.all([
-    prisma.reward.findFirst({
-      where: { userId: session.user.id, createdAt: { gte: startOfToday() } },
-    }),
-    getActiveRewards(session.user.id),
-  ]);
-
+export default function SpinPage() {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-8 px-4 py-16 text-center">
-      <div>
-        <h1 className="font-display text-2xl tracking-tight">Spin & win</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          One free spin a day. Prizes are applied automatically at
-          checkout.
+    <main className="min-h-screen bg-[#090909] px-5 py-16 text-[#f6f0e6] sm:py-24">
+      <section className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-[#a98b58]/30 bg-[#11100e] px-7 py-14 text-center sm:px-12">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#c7a76e]/40 bg-[#c7a76e]/10 text-4xl">
+          ✦
+        </div>
+
+        <p className="mt-8 text-xs font-semibold uppercase tracking-[0.3em] text-[#c7a76e]">
+          Pikaboo Rewards
         </p>
-      </div>
 
-      <SpinWheel alreadySpun={!!alreadySpun} />
+        <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+          Something rewarding
+          <span className="block text-[#d4b47b]">
+            is coming.
+          </span>
+        </h1>
 
-      {activeRewards.length > 0 && (
-        <Card className="w-full text-left text-sm">
-          <h2 className="font-semibold">Your rewards</h2>
-          <ul className="mt-2 flex flex-col gap-1 text-neutral-600 dark:text-neutral-400">
-            {activeRewards.map((reward) => (
-              <li key={reward.id} className="flex justify-between">
-                <span>
-                  {reward.kind === "PERCENT_OFF"
-                    ? `${reward.value}% off`
-                    : "Free shipping"}{" "}
-                  — <span className="font-mono">{reward.code}</span>
-                </span>
-                <span className="text-xs text-neutral-400">
-                  expires {new Date(reward.expiresAt).toLocaleDateString()}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-    </div>
+        <p className="mx-auto mt-6 max-w-lg text-base leading-8 text-[#c7c1b6]">
+          We're preparing a new rewards experience for the
+          Pikaboo community. The spin wheel and promotional
+          rewards will become available in a future launch phase.
+        </p>
+
+        <div className="mt-8 rounded-2xl border border-[#a98b58]/20 bg-[#19150f] p-5">
+          <p className="text-sm leading-7 text-[#c7c1b6]">
+            Rewards are not currently being issued or redeemed.
+            Online checkout is also unavailable during prelaunch.
+          </p>
+        </div>
+
+        <div className="mt-9 flex flex-wrap justify-center gap-4">
+          <Link
+            href="/products"
+            className="rounded-xl bg-[#c7a76e] px-6 py-3 font-semibold text-[#100d09] transition hover:bg-[#e0c18a]"
+          >
+            Explore products
+          </Link>
+
+          <Link
+            href="/community"
+            className="rounded-xl border border-[#a98b58]/50 px-6 py-3 font-semibold text-[#ead4ad] transition hover:bg-[#a98b58]/10"
+          >
+            Explore community
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }

@@ -1,121 +1,246 @@
+
 import Link from "next/link";
 import { getCategories, getFeaturedProducts } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
-import { SITE_NAME } from "@/lib/constants";
+import { prisma } from "@/lib/prisma";
 
-const perks = [
-  { emoji: "📦", title: "Discreet shipping", desc: "Plain packaging, neutral billing", href: "/products" },
-  { emoji: "🎡", title: "Spin & win", desc: "One free spin a day", href: "/spin" },
-  { emoji: "🤝", title: "Group buy deals", desc: "Prices drop as friends join", href: "/products" },
-];
+const goldButton =
+  "inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#f7dba2] via-[#e8bf79] to-[#bd8c49] px-7 py-3 text-sm font-semibold text-[#21160d] shadow-lg shadow-black/30 transition hover:brightness-110";
+
+const outlineButton =
+  "inline-flex items-center justify-center rounded-full border border-[#d4ae75]/50 bg-black/30 px-7 py-3 text-sm font-medium text-[#f5e8d4] transition hover:bg-[#d4ae75]/10";
 
 export default async function HomePage() {
-  const [categories, featured] = await Promise.all([
+  const [categories, featured, creators] = await Promise.all([
     getCategories(),
     getFeaturedProducts(),
+    prisma.creatorProfile.findMany({
+      where: {
+        isApproved: true,
+        ageVerified: true,
+        identityVerified: true,
+      },
+      orderBy: [
+        { isAvailable: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: 3,
+    }),
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
-      <section className="relative overflow-hidden rounded-[2rem] border border-neutral-200 bg-neutral-950 px-6 py-16 text-white shadow-2xl shadow-violet-950/10 sm:px-10 sm:py-20">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 h-80 w-80 rounded-full bg-violet-500/15 blur-3xl" />
-        <div className="relative max-w-3xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full pikaboo-gradient" />
-            Discreet shopping + private creator community
-          </div>
-          <h1 className="text-5xl font-semibold tracking-tight sm:text-6xl">
-            <span className="pikaboo-text-gradient">{SITE_NAME}</span>
-            <span className="block text-white">made a little more exciting.</span>
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-            Shop curated adult products from trusted vendors, discover creators, and keep your experience discreet from checkout to community.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/products" className="rounded-full pikaboo-gradient px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-950/20 transition hover:scale-[1.02]">
-              Shop the collection
-            </Link>
-            <Link href="/community" className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10">
-              Explore Community
-            </Link>
-          </div>
-          <div className="mt-9 grid max-w-xl grid-cols-3 gap-4 text-xs text-white/60 sm:text-sm">
-            <div><div className="font-semibold text-white">18+</div><div className="mt-1">Age-gated</div></div>
-            <div><div className="font-semibold text-white">Discreet</div><div className="mt-1">Packaging & billing</div></div>
-            <div><div className="font-semibold text-white">Private</div><div className="mt-1">Creator sessions</div></div>
-          </div>
-        </div>
-      </section>
+    <div className="bg-[#0c090a] text-[#f8f0e7]">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-5 sm:px-6 lg:px-8">
+        <section className="relative isolate overflow-hidden rounded-[1.5rem] border border-[#c69a62]/60 bg-[#151012] shadow-2xl shadow-black/50">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_35%,rgba(156,83,70,0.35),transparent_45%),radial-gradient(ellipse_at_45%_90%,rgba(184,126,62,0.20),transparent_48%),linear-gradient(120deg,#0d0a0c,#23161a_65%,#100c0d)]" />
 
-      <section className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {perks.map((perk) => (
-          <Link
-            key={perk.title}
-            href={perk.href}
-            className="pikaboo-card flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950"
-          >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-lg dark:bg-brand-900/30">
-              {perk.emoji}
-            </span>
+          <div className="relative grid min-h-[490px] items-center gap-10 px-6 py-16 sm:px-12 lg:grid-cols-[1.1fr_0.9fr] lg:px-16 lg:py-24">
+            <div className="max-w-2xl">
+              <p className="mb-7 text-xs uppercase tracking-[0.25em] text-[#dfb981]">
+                — A new world of discovery
+              </p>
+
+              <h1 className="font-serif text-5xl leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+                Discover talent.
+                <span className="mt-2 block text-[#e6c18a]">
+                  Shop their world.
+                </span>
+              </h1>
+
+              <p className="mt-7 max-w-xl text-base leading-8 text-[#e6d8cc]/80 sm:text-lg">
+                Explore an exclusive creator community and discover
+                a curated collection of products, experiences,
+                and inspiration.
+              </p>
+
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Link href="/community/creators" className={goldButton}>
+                  Explore creators ↗
+                </Link>
+                <Link href="/products" className={outlineButton}>
+                  Shop the collection
+                </Link>
+              </div>
+
+              <p className="mt-8 text-xs text-[#d8c7b4]/60">
+                18+ community · Product catalog in preview ·
+                Secure checkout coming soon
+              </p>
+            </div>
+
+            <div className="relative hidden min-h-[340px] items-center justify-center lg:flex">
+              <div className="absolute h-[310px] w-[310px] rounded-full border border-[#d7aa71]/20" />
+              <div className="absolute h-[245px] w-[245px] rounded-full border border-[#d7aa71]/25" />
+              <div className="relative text-center">
+                <div className="font-serif text-8xl tracking-[0.12em] text-[#e8c18a]">
+                  P
+                </div>
+                <p className="mt-4 text-xs uppercase tracking-[0.6em] text-[#d4af79]">
+                  PIKABOO
+                </p>
+                <p className="mt-5 text-xs tracking-[0.2em] text-[#e3d4c5]/50">
+                  THE PRIVATE COLLECTION
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-14">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold">{perk.title}</p>
-              <p className="text-xs text-neutral-500">{perk.desc}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-[#cba36d]">
+                The community
+              </p>
+              <h2 className="mt-2 font-serif text-3xl sm:text-4xl">
+                Featured creators
+              </h2>
+              <p className="mt-3 text-sm text-[#d9c5b5]/70">
+                A preview of the Pikaboo creator experience.
+              </p>
             </div>
-          </Link>
-        ))}
-      </section>
 
-      <section className="mt-12">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Browse</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight">Shop by category</h2>
-          </div>
-          <Link href="/products" className="text-sm font-medium text-neutral-500 transition hover:text-neutral-900 dark:hover:text-white">View all →</Link>
-        </div>
-        <div className="mt-5 flex flex-wrap gap-2.5">
-          {categories.map((category) => (
-            <Link key={category.id} href={`/products?category=${category.slug}`} className="pikaboo-card rounded-full border border-neutral-200 bg-white/70 px-4 py-2 text-sm font-medium backdrop-blur hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-600">
-              {category.name}
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-14">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Fresh picks</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight">New arrivals</h2>
-          </div>
-          <Link href="/products" className="text-sm font-medium text-neutral-500 transition hover:text-neutral-900 dark:hover:text-white">View all →</Link>
-        </div>
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {featured.map((product) => (
-            <div key={product.id} className="pikaboo-card rounded-2xl">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-14 rounded-[2rem] border border-neutral-200 bg-white/70 p-7 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60 sm:p-9">
-        <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Pikaboo Community</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">More than a storefront.</h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-              Discover approved creators, send a paid connection request, and continue into private sessions when accepted. The marketplace and community stay connected without sharing one checkout flow.
-            </p>
-          </div>
-          <div className="flex justify-start md:justify-end">
-            <Link href="/community" className="rounded-full pikaboo-gradient px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/10 transition hover:scale-[1.02]">
-              Enter the community
+            <Link
+              href="/community/creators"
+              className="text-sm text-[#e1b982] hover:text-white"
+            >
+              Explore all ↗
             </Link>
           </div>
-        </div>
-      </section>
+
+          {creators.length > 0 ? (
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {creators.map((creator) => (
+                <Link
+                  key={creator.id}
+                  href={`/community/creators/${creator.id}`}
+                  className="group overflow-hidden rounded-2xl border border-[#6f5140]/60 bg-[#1c1417] transition hover:-translate-y-1 hover:border-[#d4ae75]"
+                >
+                  <div className="relative h-72 overflow-hidden bg-[linear-gradient(145deg,#443039,#171114)]">
+                    {creator.bannerUrl || creator.avatarUrl ? (
+                      <img
+                        src={creator.bannerUrl || creator.avatarUrl || ""}
+                        alt={`${creator.displayName} profile artwork`}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center font-serif text-7xl text-[#e6c18a]/60">
+                        {creator.displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+
+                    <span className="absolute bottom-4 left-4 rounded-full border border-[#e6c18a]/30 bg-black/70 px-3 py-1 text-xs text-[#f0c98c] backdrop-blur">
+                      Creator preview
+                    </span>
+                  </div>
+
+                  <div className="p-5">
+                    <h3 className="font-serif text-2xl text-[#f5e6d6]">
+                      {creator.displayName}
+                    </h3>
+
+                    <p className="mt-2 line-clamp-2 min-h-10 text-sm text-[#d9c5b5]/70">
+                      {creator.bio || "Discover this creator's profile and community."}
+                    </p>
+
+                    <div className="mt-5 flex items-center justify-between border-t border-[#6f5140]/40 pt-4 text-sm">
+                      <span className="text-[#e1b982]">
+                        View profile
+                      </span>
+                      <span className="text-[#e1b982]">↗</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-[#6f5140]/60 bg-[#1c1417] px-6 py-14 text-center">
+              <h3 className="font-serif text-2xl text-[#f0c98c]">
+                Something exclusive is coming.
+              </h3>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-[#d9c5b5]/70">
+                We're preparing the Pikaboo creator community.
+                Featured profiles will appear here as onboarding
+                and verification are completed.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section className="mt-16">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-[#cba36d]">
+                Curated selections
+              </p>
+              <h2 className="mt-2 font-serif text-3xl sm:text-4xl">
+                Shop the collection
+              </h2>
+              <p className="mt-3 text-sm text-[#d6c3b3]/70">
+                Preview products. Inventory and checkout are not yet available.
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="text-sm text-[#e1b982] hover:text-white"
+            >
+              View collection ↗
+            </Link>
+          </div>
+
+          {featured.length > 0 ? (
+            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {featured.slice(0, 4).map((product) => (
+                <div
+                  key={product.id}
+                  className="overflow-hidden rounded-2xl border border-[#5d4438] bg-[#21191a] p-2"
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-[#5d4438] bg-[#171113] p-10 text-center text-[#d9c5b5]/70">
+              Our collection is being curated. Check back soon.
+            </div>
+          )}
+
+          {categories.length > 0 && (
+            <div className="mt-7 flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/products?category=${category.slug}`}
+                  className="rounded-full border border-[#795b45] px-4 py-2 text-xs text-[#e4cda9] transition hover:border-[#e3bd85] hover:bg-[#d7ad72]/10"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="mt-16 overflow-hidden rounded-[1.5rem] border border-[#7a583d] bg-[linear-gradient(115deg,#281b1d,#100c0e)] px-6 py-12 sm:px-10">
+          <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-[#cba36d]">
+                Beyond the storefront
+              </p>
+              <h2 className="mt-3 font-serif text-3xl sm:text-4xl">
+                A more personal experience.
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#d9c5b5]/75">
+                Pikaboo brings discovery, shopping, and community
+                together in one destination. Explore our creator
+                community while we prepare more experiences for launch.
+              </p>
+            </div>
+            <Link href="/community" className={goldButton}>
+              Enter the community ↗
+            </Link>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

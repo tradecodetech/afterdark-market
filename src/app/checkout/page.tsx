@@ -35,9 +35,10 @@ export default async function CheckoutPage() {
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-display text-2xl tracking-tight">Checkout</h1>
       <p className="mt-1 text-sm text-neutral-500">
-        Shipping is discreet. Your billing statement will read{" "}
-        <span className="font-medium">&ldquo;PKB* RETAIL&rdquo;</span>.
-      </p>
+  Checkout is currently in preview mode. Online payments and
+  order placement will become available after our payment
+  processing setup is complete.
+</p>
 
       <CheckoutClient
         items={items}

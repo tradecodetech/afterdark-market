@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
 };
 
-const SUPPORT_EMAIL = "damon.gcesolutions@gmail.com";
+const SUPPORT_EMAIL = "info@pikabooxo.com";
 
 const sections = [
   {

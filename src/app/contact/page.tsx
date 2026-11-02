@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "Contact Pikaboo customer support for help with accounts, orders, vendors, and creator community questions.",
 };
 
-const SUPPORT_EMAIL = "damon.gcesolutions@gmail.com";
+const SUPPORT_EMAIL = "info@pikabooxo.com";
 
 export default function ContactPage() {
   return (

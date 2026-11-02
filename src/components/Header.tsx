@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { SITE_NAME, ROLES } from "@/lib/constants";
@@ -6,7 +7,11 @@ import { prisma } from "@/lib/prisma";
 
 export default async function Header() {
   const session = await auth();
-  const cartCount = session?.user ? await getCartCount(session.user.id) : 0;
+
+  const cartCount = session?.user
+    ? await getCartCount(session.user.id)
+    : 0;
+
   const phoneVerified = session?.user
     ? (
         await prisma.user.findUnique({
@@ -17,6 +22,7 @@ export default async function Header() {
     : true;
 
   const navLinks = [
+    { href: "/community/creators", label: "Discover" },
     { href: "/products", label: "Shop" },
     { href: "/community", label: "Community" },
     { href: "/feed", label: "Feed" },
@@ -27,59 +33,74 @@ export default async function Header() {
     ...(session?.user?.role === ROLES.VENDOR
       ? [{ href: "/vendor", label: "Vendor Dashboard" }]
       : []),
-    ...(session?.user?.role === ROLES.ADMIN ? [{ href: "/admin", label: "Admin" }] : []),
+    ...(session?.user?.role === ROLES.ADMIN
+      ? [{ href: "/admin", label: "Admin" }]
+      : []),
   ];
 
   const linkClass =
-    "text-sm font-medium text-white/85 transition hover:text-white";
+    "text-sm font-medium text-[#e9dac8]/80 transition hover:text-[#f0c98c]";
+
+  const signOutAction = async () => {
+    "use server";
+    await signOut({ redirectTo: "/" });
+  };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/75 text-white shadow-lg shadow-black/10 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-[#c69a62]/30 bg-[#100c0e]/95 text-[#f8f0e7] shadow-xl shadow-black/30 backdrop-blur-xl">
       {session?.user && !phoneVerified && (
-        <div className="bg-amber-50 px-4 py-2 text-center text-xs font-medium text-amber-900 dark:bg-amber-950/60 dark:text-amber-200">
-          <Link href="/auth/verify-phone" className="underline underline-offset-2">
+        <div className="border-b border-[#c69a62]/30 bg-[#2b2119] px-4 py-2 text-center text-xs text-[#f0c98c]">
+          <Link
+            href="/auth/verify-phone"
+            className="font-semibold underline underline-offset-2"
+          >
             Verify your phone number
           </Link>{" "}
           to finish securing your account.
         </div>
       )}
 
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-sm">
-            👀
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex shrink-0 items-center gap-3">
+          <span className="font-serif text-2xl tracking-[0.14em] text-[#f0c98c] sm:text-3xl">
+            {SITE_NAME.toUpperCase()}
           </span>
-          <span className="font-display text-lg tracking-tight text-white">{SITE_NAME}</span>
+          <span className="rounded-md border border-[#d5af79]/60 px-1.5 py-0.5 text-[10px] tracking-wide text-[#f0c98c]">
+            18+
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav
+          aria-label="Main navigation"
+          className="hidden items-center gap-6 lg:flex"
+        >
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className={linkClass}>
+            <Link
+              key={link.href}
+              href={link.href}
+              className={linkClass}
+            >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-5 md:flex">
-          <Link href="/cart" className={`${linkClass} relative`}>
+        <div className="hidden shrink-0 items-center gap-4 lg:flex">
+          <Link href="/cart" className={linkClass}>
             Cart
             {cartCount > 0 && (
-              <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-xs font-semibold text-white">
+              <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d5a765] px-1 text-xs font-semibold text-[#21160d]">
                 {cartCount}
               </span>
             )}
           </Link>
+
           {session?.user ? (
             <>
               <Link href="/account" className={linkClass}>
                 Account
               </Link>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
+              <form action={signOutAction}>
                 <button type="submit" className={linkClass}>
                   Sign out
                 </button>
@@ -87,63 +108,88 @@ export default async function Header() {
             </>
           ) : (
             <Link
-              href="/auth/login"
-              className="rounded-full bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400"
+              href="/auth/register"
+              className="rounded-full bg-gradient-to-r from-[#f7dba2] via-[#e8bf79] to-[#bd8c49] px-6 py-2.5 text-sm font-semibold text-[#21160d] transition hover:brightness-110"
             >
-              Sign in
+              Join Free
             </Link>
           )}
         </div>
 
-        {/* Mobile: cart + CSS-only hamburger toggle, no client JS needed */}
-        <div className="flex items-center gap-3 md:hidden">
-          <Link href="/cart" className="relative text-sm font-medium text-white">
+        <div className="flex items-center gap-3 lg:hidden">
+          <Link
+            href="/cart"
+            className="relative text-sm text-[#e9dac8]"
+          >
             Cart
             {cartCount > 0 && (
-              <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-xs font-semibold text-white">
+              <span className="ml-1 rounded-full bg-[#d5a765] px-1.5 py-0.5 text-xs text-[#21160d]">
                 {cartCount}
               </span>
             )}
           </Link>
-          <label
-            htmlFor="mobile-nav-toggle"
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/25 text-white"
-            aria-label="Open menu"
-          >
-            ☰
-          </label>
+
+          <details className="group relative">
+            <summary
+              aria-label="Toggle navigation menu"
+              className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[#d5af79]/50 text-[#f0c98c] [&::-webkit-details-marker]:hidden"
+            >
+              <span className="text-xl leading-none">☰</span>
+            </summary>
+
+            <nav
+              aria-label="Mobile navigation"
+              className="absolute right-0 top-12 z-50 flex w-64 flex-col gap-1 rounded-xl border border-[#c69a62]/40 bg-[#171113] p-3 shadow-2xl shadow-black/60"
+            >
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg px-3 py-2.5 text-sm text-[#e9dac8] hover:bg-[#d5af79]/10 hover:text-[#f0c98c]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              <div className="my-1 border-t border-[#c69a62]/20" />
+
+              {session?.user ? (
+                <>
+                  <Link
+                    href="/account"
+                    className="rounded-lg px-3 py-2.5 text-sm text-[#e9dac8]"
+                  >
+                    Account
+                  </Link>
+                  <form action={signOutAction}>
+                    <button
+                      type="submit"
+                      className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-[#e9dac8]"
+                    >
+                      Sign out
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/register"
+                    className="rounded-lg bg-[#d5a765] px-3 py-2.5 text-center text-sm font-semibold text-[#21160d]"
+                  >
+                    Join Free
+                  </Link>
+                  <Link
+                    href="/auth/login"
+                    className="rounded-lg px-3 py-2.5 text-center text-sm text-[#e9dac8]"
+                  >
+                    Sign in
+                  </Link>
+                </>
+              )}
+            </nav>
+          </details>
         </div>
       </div>
-
-      <input type="checkbox" id="mobile-nav-toggle" className="peer hidden" />
-      <nav className="hidden flex-col gap-1 border-t border-white/10 bg-black/90 px-4 py-3 text-white peer-checked:flex md:hidden">
-        {navLinks.map((link) => (
-          <Link key={link.href} href={link.href} className="rounded-lg px-2 py-2.5 text-sm font-medium">
-            {link.label}
-          </Link>
-        ))}
-        {session?.user ? (
-          <>
-            <Link href="/account" className="rounded-lg px-2 py-2.5 text-sm font-medium">
-              Account
-            </Link>
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/" });
-              }}
-            >
-              <button type="submit" className="w-full rounded-lg px-2 py-2.5 text-left text-sm font-medium">
-                Sign out
-              </button>
-            </form>
-          </>
-        ) : (
-          <Link href="/auth/login" className="rounded-lg px-2 py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400">
-            Sign in
-          </Link>
-        )}
-      </nav>
     </header>
   );
 }
