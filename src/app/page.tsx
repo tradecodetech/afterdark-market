@@ -5,10 +5,10 @@ import ProductCard from "@/components/ProductCard";
 import { prisma } from "@/lib/prisma";
 
 const goldButton =
-  "inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#f7dba2] via-[#e8bf79] to-[#bd8c49] px-7 py-3 text-sm font-semibold text-[#21160d] shadow-lg shadow-black/30 transition hover:brightness-110";
+  "inline-flex items-center justify-center rounded-none bg-gradient-to-r from-[#f7dba2] via-[#e8bf79] to-[#bd8c49] px-7 py-3 text-sm font-semibold text-[#21160d] shadow-lg shadow-black/30 transition hover:brightness-110";
 
 const outlineButton =
-  "inline-flex items-center justify-center rounded-full border border-[#d4ae75]/50 bg-black/30 px-7 py-3 text-sm font-medium text-[#f5e8d4] transition hover:bg-[#d4ae75]/10";
+  "inline-flex items-center justify-center rounded-none border border-[#d4ae75]/50 bg-black/30 px-7 py-3 text-sm font-medium text-[#f5e8d4] transition hover:bg-[#d4ae75]/10";
 
 export default async function HomePage() {
   const [categories, featured, creators] = await Promise.all([
@@ -31,8 +31,8 @@ export default async function HomePage() {
   return (
     <div className="bg-[#0c090a] text-[#f8f0e7]">
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-5 sm:px-6 lg:px-8">
-        <section className="relative isolate overflow-hidden rounded-[1.5rem] border border-[#c69a62]/60 bg-[#151012] shadow-2xl shadow-black/50">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_35%,rgba(156,83,70,0.35),transparent_45%),radial-gradient(ellipse_at_45%_90%,rgba(184,126,62,0.20),transparent_48%),linear-gradient(120deg,#0d0a0c,#23161a_65%,#100c0d)]" />
+        <section className="relative isolate overflow-hidden bg-[#151113]">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,#151113_0%,#1c1718_65%,#151113_100%)]" />
 
           <div className="relative grid min-h-[490px] items-center gap-10 px-6 py-16 sm:px-12 lg:grid-cols-[1.1fr_0.9fr] lg:px-16 lg:py-24">
             <div className="max-w-2xl">
@@ -69,8 +69,8 @@ export default async function HomePage() {
             </div>
 
             <div className="relative hidden min-h-[340px] items-center justify-center lg:flex">
-              <div className="absolute h-[310px] w-[310px] rounded-full border border-[#d7aa71]/20" />
-              <div className="absolute h-[245px] w-[245px] rounded-full border border-[#d7aa71]/25" />
+              <div className="absolute h-[310px] w-[310px] rounded-none border border-[#d7aa71]/20" />
+              <div className="absolute h-[245px] w-[245px] rounded-none border border-[#d7aa71]/25" />
               <div className="relative text-center">
                 <div className="font-serif text-8xl tracking-[0.12em] text-[#e8c18a]">
                   P
@@ -114,7 +114,7 @@ export default async function HomePage() {
                 <Link
                   key={creator.id}
                   href={`/community/creators/${creator.id}`}
-                  className="group overflow-hidden rounded-2xl border border-[#6f5140]/60 bg-[#1c1417] transition hover:-translate-y-1 hover:border-[#d4ae75]"
+                  className="group overflow-hidden rounded-none border border-[#6f5140]/60 bg-[#1c1417] transition hover:-translate-y-1 hover:border-[#d4ae75]"
                 >
                   <div className="relative h-72 overflow-hidden bg-[linear-gradient(145deg,#443039,#171114)]">
                     {creator.bannerUrl || creator.avatarUrl ? (
@@ -129,7 +129,7 @@ export default async function HomePage() {
                       </div>
                     )}
 
-                    <span className="absolute bottom-4 left-4 rounded-full border border-[#e6c18a]/30 bg-black/70 px-3 py-1 text-xs text-[#f0c98c] backdrop-blur">
+                    <span className="absolute bottom-4 left-4 rounded-none border border-[#e6c18a]/30 bg-black/70 px-3 py-1 text-xs text-[#f0c98c] backdrop-blur">
                       Creator preview
                     </span>
                   </div>
@@ -154,7 +154,7 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="mt-6 rounded-2xl border border-[#6f5140]/60 bg-[#1c1417] px-6 py-14 text-center">
+            <div className="mt-6 rounded-none border border-[#6f5140]/60 bg-[#1c1417] px-6 py-14 text-center">
               <h3 className="font-serif text-2xl text-[#f0c98c]">
                 Something exclusive is coming.
               </h3>
@@ -193,14 +193,14 @@ export default async function HomePage() {
               {featured.slice(0, 4).map((product) => (
                 <div
                   key={product.id}
-                  className="overflow-hidden rounded-2xl border border-[#5d4438] bg-[#21191a] p-2"
+                  className="overflow-hidden rounded-none border border-[#5d4438] bg-[#21191a] p-2"
                 >
                   <ProductCard product={product} />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="mt-6 rounded-2xl border border-[#5d4438] bg-[#171113] p-10 text-center text-[#d9c5b5]/70">
+            <div className="mt-6 rounded-none border border-[#5d4438] bg-[#171113] p-10 text-center text-[#d9c5b5]/70">
               Our collection is being curated. Check back soon.
             </div>
           )}
@@ -211,7 +211,7 @@ export default async function HomePage() {
                 <Link
                   key={category.id}
                   href={`/products?category=${category.slug}`}
-                  className="rounded-full border border-[#795b45] px-4 py-2 text-xs text-[#e4cda9] transition hover:border-[#e3bd85] hover:bg-[#d7ad72]/10"
+                  className="rounded-none border border-[#795b45] px-4 py-2 text-xs text-[#e4cda9] transition hover:border-[#e3bd85] hover:bg-[#d7ad72]/10"
                 >
                   {category.name}
                 </Link>

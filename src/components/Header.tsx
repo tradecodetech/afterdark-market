@@ -65,7 +65,7 @@ export default async function Header() {
           <span className="font-serif text-2xl tracking-[0.14em] text-[#f0c98c] sm:text-3xl">
             {SITE_NAME.toUpperCase()}
           </span>
-          <span className="rounded-md border border-[#d5af79]/60 px-1.5 py-0.5 text-[10px] tracking-wide text-[#f0c98c]">
+          <span className="rounded-none border border-[#d5af79]/60 px-1.5 py-0.5 text-[10px] tracking-wide text-[#f0c98c]">
             18+
           </span>
         </Link>
@@ -89,7 +89,7 @@ export default async function Header() {
           <Link href="/cart" className={linkClass}>
             Cart
             {cartCount > 0 && (
-              <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d5a765] px-1 text-xs font-semibold text-[#21160d]">
+              <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-none bg-[#d5a765] px-1 text-xs font-semibold text-[#21160d]">
                 {cartCount}
               </span>
             )}
@@ -109,7 +109,7 @@ export default async function Header() {
           ) : (
             <Link
               href="/auth/register"
-              className="rounded-full bg-gradient-to-r from-[#f7dba2] via-[#e8bf79] to-[#bd8c49] px-6 py-2.5 text-sm font-semibold text-[#21160d] transition hover:brightness-110"
+              className="rounded-none bg-gradient-to-r from-[#f7dba2] via-[#e8bf79] to-[#bd8c49] px-6 py-2.5 text-sm font-semibold text-[#21160d] transition hover:brightness-110"
             >
               Join Free
             </Link>
@@ -123,7 +123,7 @@ export default async function Header() {
           >
             Cart
             {cartCount > 0 && (
-              <span className="ml-1 rounded-full bg-[#d5a765] px-1.5 py-0.5 text-xs text-[#21160d]">
+              <span className="ml-1 rounded-none bg-[#d5a765] px-1.5 py-0.5 text-xs text-[#21160d]">
                 {cartCount}
               </span>
             )}
@@ -132,20 +132,20 @@ export default async function Header() {
           <details className="group relative">
             <summary
               aria-label="Toggle navigation menu"
-              className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[#d5af79]/50 text-[#f0c98c] [&::-webkit-details-marker]:hidden"
+              className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-none border border-[#d5af79]/50 text-[#f0c98c] [&::-webkit-details-marker]:hidden"
             >
               <span className="text-xl leading-none">☰</span>
             </summary>
 
             <nav
               aria-label="Mobile navigation"
-              className="absolute right-0 top-12 z-50 flex w-64 flex-col gap-1 rounded-xl border border-[#c69a62]/40 bg-[#171113] p-3 shadow-2xl shadow-black/60"
+              className="absolute right-0 top-12 z-50 flex w-64 flex-col gap-1 rounded-none border border-[#c69a62]/40 bg-[#171113] p-3 shadow-2xl shadow-black/60"
             >
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-lg px-3 py-2.5 text-sm text-[#e9dac8] hover:bg-[#d5af79]/10 hover:text-[#f0c98c]"
+                  className="rounded-none px-3 py-2.5 text-sm text-[#e9dac8] hover:bg-[#d5af79]/10 hover:text-[#f0c98c]"
                 >
                   {link.label}
                 </Link>
@@ -157,14 +157,14 @@ export default async function Header() {
                 <>
                   <Link
                     href="/account"
-                    className="rounded-lg px-3 py-2.5 text-sm text-[#e9dac8]"
+                    className="rounded-none px-3 py-2.5 text-sm text-[#e9dac8]"
                   >
                     Account
                   </Link>
                   <form action={signOutAction}>
                     <button
                       type="submit"
-                      className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-[#e9dac8]"
+                      className="w-full rounded-none px-3 py-2.5 text-left text-sm text-[#e9dac8]"
                     >
                       Sign out
                     </button>
@@ -174,13 +174,13 @@ export default async function Header() {
                 <>
                   <Link
                     href="/auth/register"
-                    className="rounded-lg bg-[#d5a765] px-3 py-2.5 text-center text-sm font-semibold text-[#21160d]"
+                    className="rounded-none bg-[#d5a765] px-3 py-2.5 text-center text-sm font-semibold text-[#21160d]"
                   >
                     Join Free
                   </Link>
                   <Link
                     href="/auth/login"
-                    className="rounded-lg px-3 py-2.5 text-center text-sm text-[#e9dac8]"
+                    className="rounded-none px-3 py-2.5 text-center text-sm text-[#e9dac8]"
                   >
                     Sign in
                   </Link>
